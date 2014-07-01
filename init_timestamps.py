@@ -22,7 +22,7 @@ def store_stamps(new_stamps, ts_file):
     f.close()
 
 def open_records(ts_file):
-    'Retrieves data from timestamp file.'
+    'Retrieves data from the timestamp file.'
     f = open(ts_file, 'r+')
     r = pickle.load(f)
     f.close()
@@ -48,12 +48,16 @@ def stamps_to_files(stamps):
     return t
 
 if __name__ == '__main__':    
+#   Processes command line arguments
     args = sys.argv
-    if len(args) != 2:
+    if len(args) not in [2,3]:
         print 'Usage error.'
-
     temp_dir = args[1]
+    if len(args) == 3:
+        ts_file = args[2]
+    else:
+        ts_file = default_ts_file
 
     s = get_stamps(temp_dir)
     print s
-    store_stamps(s, default_ts_file)
+    store_stamps(s, ts_file)

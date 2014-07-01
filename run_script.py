@@ -13,11 +13,14 @@ def update_files(to_update):
 
 if __name__ == '__main__':
     dirname = sys.argv[1]
+    if len(sys.argv) == 3:
+        ts_file = sys.argv[2]
+    else: 
+        ts_file = default_ts_file
 
     curr_stamps = get_stamps(dirname)
-    old_stamps  = open_records(default_ts_file)
+    old_stamps  = open_records(ts_file)
     to_update = stamps_to_files(curr_stamps - old_stamps)
 
     update_files(to_update)
-    store_stamps(curr_stamps, default_ts_file)
-    
+    store_stamps(curr_stamps, ts_file)
