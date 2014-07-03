@@ -3,6 +3,11 @@ Description
 A script which monitors a directory for changes to or new .xyz files 
 and then runs various processing tools on them.  
 
+A timestamps file (default: timestamps.txt) is created once at the beginning of each session.  
+
+Note: If the file is not stored between sessions or files were already updated, this may cause unneeded updating.  If the file is for a different directory, 
+it will be overwritten.  
+
 Written in Python 2.7.3
 
 usage: main.sh dir [ts\_file]
@@ -14,6 +19,9 @@ Requirements
 - sys
 - glob
 - pickle
+
+- periodic
+
 
 ### Script applies following programs: 
 - Avogadro
@@ -28,15 +36,12 @@ filetype, then applies a script to any files changed in the past 5 seconds.
 
 To change the regex applied, change init\_timestamps.regex.  To change what command is run, edit the update function in run\_script.py.  Update interval is controlled by the call to watch in main.sh.
 
-Known Bugs
+Usage Notes
 ===========
-- If the timestamp file (either the default or the given name) is for a different directory, the previous file will be overwritten!  
-- If the timestamp file exists, but is not of expected format (pickled set of timestamps), the script will fail.
-
-As commented in init\_timestamps.py, the timestamps.txt file is created once 
-at the beginning of each session, if the file does not already exist, this may cause unnecessary updating if the timestamps file is outdated.
+Be cautious with timestamps file if you write several to the same place.  
+- If the timestamp file named (or default) is meant for a different directory, the previous file will be overwritten, currently without check.
+- If the timestamp file exists, but is not of expected format (pickled set of timestamps), the script will fail.  This is usually harmless, but may result in overwriting of the timestamp file.
 
 Changelog 
 ==========
-- Allows optional input of name of text file to use for timestamps, allowing 
-more flexibility when using the script for multiple directories.  
+- Added some checks to the 
