@@ -51,7 +51,7 @@ if __name__ == '__main__':
 #   Processes command line arguments
     args = sys.argv
     if len(args) not in [2,3]:
-        print 'Usage error.'
+        print 'Usage error : takes in 2 or 3 arguments'
     temp_dir = args[1]
     if len(args) == 3:
         ts_file = args[2]

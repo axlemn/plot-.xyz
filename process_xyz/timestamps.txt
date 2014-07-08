@@ -1,0 +1,15 @@
+c__builtin__
+set
+p0
+((lp1
+(S'./Ta2O5.xyz'
+p2
+F1404838043.0672722
+tp3
+a(S'./AllTetrahedral.xyz'
+p4
+F1404838645.3152468
+tp5
+atp6
+Rp7
+.

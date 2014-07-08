@@ -4,6 +4,7 @@
 import periodic as pt
 import sys
 import re
+import os.path
 
 # Note: have not yet enforced anything to do with central atom, nor 
 # with having an atom at (0,0,0).
@@ -13,7 +14,7 @@ def title(f_name):
 #   Gets the title of the .xyz file to make into the title of feff.inp
     if f_name[-4:] != ".xyz":
         raise Exception("`Not a .xyz file!")
-    return "Test " + f_name[0:-4]
+    return "Test " + os.path.basename(f_name)
 
 def scrape_xyz(f_name):
 #   Gets data from a file of format .xyz
@@ -48,12 +49,11 @@ def dictionary_from_elts(elts):
 def central_atom_check(atoms):
 #   Checks that some atom is the central element, and checks 
 #   that the central atom is of the type central_elt
-#   OR that the central atom is placed first!!!
     atom_list = []
 
     for (i,a) in enumerate(atom_list):
         if (float(a[1]), float(a[2]), float(a[3])) == (0,0,0):
-            if i == 0 or a[0] == central_elt:
+            if a[0] == central_elt:
                 return True
             return False
     return False
@@ -61,10 +61,10 @@ def central_atom_check(atoms):
 def shift_atoms(atoms):
     atom_list = []
     to_subtract = []
+
+    # Gets shift amount by from first element listed of type central_elt
     for (i,a) in enumerate(atoms):
         atom_list.append([a[0], float(a[1]), float(a[2]), float(a[3])])
-
-#       Gets shift from first element listed of type central_elt
         if to_subtract == [] and a[0] == central_elt:
             to_subtract = [float(a[1]), float(a[2]), float(a[3])]
 
@@ -89,7 +89,6 @@ if __name__ == '__main__':
     f_name = args[1]
 
 #   Should modify so that the central atom type can be set.
-
     atom_list = scrape_xyz(f_name)
 
 #   If central atom is not of fixed type, then shifts atoms so such is the case
