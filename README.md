@@ -10,37 +10,35 @@ it will be overwritten.
 
 Written in Python 2.7.3
 
-usage: main.sh dir [ts\_file]
-
 Requirements
 ===========
-### Standard python packages:
-- subprocess
-- sys
-- glob
-- pickle
-
+### python packages:
 - periodic
 
-
-### Script applies following programs: 
-- Avogadro
-- Athena
-- IFEFFIT
-- FEFF6
-
-How to Modify
+Installation
 ===========
-The basic script periodically regexes the directory contents for a particular 
-filetype, then applies a script to any files changed in the past 5 seconds.  
+git clone git://github.com/axlemn/plot-and-transform-.xyz.git
+pip install periodic
 
-To change the regex applied, change init\_timestamps.regex.  To change what command is run, edit the update function in run\_script.py.  Update interval is controlled by the call to watch in main.sh.
+If pip is not installed, on unix systems run: 
+pip install -U pip
+
+Usage: 
+------
+main.sh dir [ts\_file]
+
 
 Usage Notes
 ===========
-Be cautious with timestamps file if you write several to the same place.  
 - If the timestamp file named (or default) is meant for a different directory, the previous file will be overwritten, currently without check.
 - If the timestamp file exists, but is not of expected format (pickled set of timestamps), the script will fail.  This is usually harmless, but may result in overwriting of the timestamp file.
+
+init_timestamps and timestamp information acts as pseudo-replacement for inotify on osx systems.  
+
+TODO
+=========
+watch and timestamp information will be replaced by watchdog (python package)
+auto-install periodic via pip using the setup.py file (as well as checking for Athena or later software)
 
 Changelog 
 ==========
