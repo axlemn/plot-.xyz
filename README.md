@@ -44,4 +44,5 @@ Be cautious with timestamps file if you write several to the same place.
 
 Changelog 
 ==========
-- Added some checks to the 
+- Changed output files
+- Modified checks to the .xyz file

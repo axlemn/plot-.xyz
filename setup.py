@@ -8,7 +8,6 @@ setup(
     version='0.1dev',
     packages=['process_xyz',],
 
-    # Trying to get python to install numpy here.  >.>  
-    install_requires=['BeautifulSoup'],
+    install_requires=['periodic'],
     long_description=open('README.md').read(),
 )

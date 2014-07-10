@@ -4,17 +4,16 @@
 # Calls some terminal command on all files which need to be 
 # updated, as specified
 
-from subprocess import call
+from subprocess import call, PIPE
 from init_timestamps import *
-from xyz_to_feff import title
 
 def update_files(to_update):
     for f in to_update:
-        fil = open(title(f) + '.inp', 'w')
-        call(['python', 'xyz_to_feff.py', f], \
-            stdout=fil)
+        output_f = open(os.path.basename(f) + '.feff.inp', 'w')
+        call(['python', 'xyz_to_feff.py', f],\
+            stdout=output_f, stderr = PIPE)
         print('Updated ' + f)
-        fil.close()
+        output_f.close()
 
 if __name__ == '__main__':
     dirname = sys.argv[1]

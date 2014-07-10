@@ -10,19 +10,13 @@ import os.path
 # with having an atom at (0,0,0).
 central_elt = "Ta"
 
-def title(f_name):
-#   Gets the title of the .xyz file to make into the title of feff.inp
-    if f_name[-4:] != ".xyz":
-        raise Exception("`Not a .xyz file!")
-    return "Test " + os.path.basename(f_name)
-
 def scrape_xyz(f_name):
 #   Gets data from a file of format .xyz
     atom_lines = []
     f = open(f_name, 'r+')
-    for line in f:
-#   if line fits regex:
-        if re.match("[A-Z]", line):
+    for (i,line) in enumerate(f):
+#   if it's at least the 3rd line:
+        if i > 1:
             atom_lines.append(line)
 
 #   Gets data from each of the lines
@@ -53,6 +47,7 @@ def central_atom_check(atoms):
 
     for (i,a) in enumerate(atom_list):
         if (float(a[1]), float(a[2]), float(a[3])) == (0,0,0):
+            print central_elt
             if a[0] == central_elt:
                 return True
             return False
@@ -88,14 +83,14 @@ if __name__ == '__main__':
         print 'Usage error.'
     f_name = args[1]
 
-#   Should modify so that the central atom type can be set.
     atom_list = scrape_xyz(f_name)
+    
 
 #   If central atom is not of fixed type, then shifts atoms so such is the case
     if not central_atom_check(atom_list):
         atom_list = shift_atoms(atom_list)
 
-    print "TITLE %s\n" % title(f_name)
+    print "TITLE %s\n" % os.path.basename(f_name)[:-4]
     print "CONTROL 1 1 1 1 1 1\n" \
           "PRINT   0 0 0 0 0 0\n"
     print "POTENTIALS\n" \
