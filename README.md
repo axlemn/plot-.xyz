@@ -20,7 +20,7 @@ Usage Notes
 main.sh dir [ts\_file]
 
 The timestamp file to be used will be overwritten at the beginning of the session, currently without check.  
-init_timestamps and timestamp information acts as pseudo-replacement for inotify on osx systems.  
+init\_timestamps and timestamp information acts as pseudo-replacement for inotify on osx systems.  
 
 TODO
 =========
