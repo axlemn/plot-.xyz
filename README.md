@@ -1,6 +1,6 @@
 Description
 ===========
-monitors a directory for changes to or new .xyz files and then runs various processing tools on them.  A timestamps file (default: timestamps.txt) is created once at the beginning of each session.  
+monitors a directory for changes to or new .xyz files and then runs various processing tools on them.  
 
 Installation
 ===========
@@ -24,6 +24,8 @@ TODO
 ====
 - Modify setup.py file 
 - Add feff processing
+- Allow pointing of program to another folder
+- Sanitize output
 
 Known bugs
 =====
