@@ -9,11 +9,14 @@ from init_timestamps import *
 
 def update_files(to_update):
     for f in to_update:
-        output_f = open(os.path.basename(f) + '.feff.inp', 'w')
-        call(['python', 'xyz_to_feff.py', f],\
-            stdout=output_f, stderr = PIPE)
-        print('Updated ' + f)
-        output_f.close()
+        update_file(f)
+
+def update_file(f):
+    output_f = open(os.path.basename(f) + '.feff.inp', 'w')
+    call(['python', 'xyz_to_feff.py', f],\
+        stdout=output_f, stderr = PIPE)
+    print('Updated ' + f)
+    output_f.close()
 
 if __name__ == '__main__':
     dirname = sys.argv[1]

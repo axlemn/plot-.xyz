@@ -77,16 +77,12 @@ def shift_atoms(atoms):
 
     return atom_list
 
-if __name__ == '__main__':
-    args = sys.argv
-    if len(args) != 2:
-        print 'Usage error.'
-    f_name = args[1]
-
+def output(f_name):
+    """ 
+    Prints the .feff conversion of a given xyz file to std.out.
+    """
     atom_list = scrape_xyz(f_name)
-    
 
-#   If central atom is not of fixed type, then shifts atoms so such is the case
     if not central_atom_check(atom_list):
         atom_list = shift_atoms(atom_list)
 
@@ -100,7 +96,6 @@ if __name__ == '__main__':
     d = dictionary_from_elts(elts)
 
     for (i,e) in enumerate(elts): 
-# Using an alternate printing method to get around python spacing issues
         sys.stdout.write(' '*9)
         sys.stdout.write(str(i))
         sys.stdout.write(' '*(11-len(str(i))))
@@ -125,5 +120,9 @@ if __name__ == '__main__':
 
     print('END')
             
-    
-
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args) != 2:
+        print 'Usage error.'
+    f_name = args[1]
+    output(f_name)

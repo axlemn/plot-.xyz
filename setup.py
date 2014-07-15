@@ -8,6 +8,5 @@ setup(
     version='0.1dev',
     packages=['process_xyz',],
 
-    install_requires=['periodic'],
-    long_description=open('README.md').read(),
+    install_requires=['periodic']
 )
