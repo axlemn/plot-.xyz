@@ -6,8 +6,6 @@ import sys
 import re
 import os.path
 
-# Note: have not yet enforced anything to do with central atom, nor 
-# with having an atom at (0,0,0).
 central_elt = "Ta"
 
 def scrape_xyz(f_name):
@@ -19,14 +17,13 @@ def scrape_xyz(f_name):
         if i > 1:
             atom_lines.append(line)
 
-#   Gets data from each of the lines
     atoms = []
     for l in atom_lines:
         atoms.append(l.split())
     return atoms
 
 def elements(atoms):
-#   Lists the elements in a list of atoms
+#   Lists the elements in a list of atoms.
     elements = []
     for a in atoms:
         if a[0] not in elements:
@@ -36,55 +33,51 @@ def elements(atoms):
 def dictionary_from_elts(elts):
 #   Dictionary giving potential-index given an element
     d = {}
-    for (i,e) in enumerate(elts):
+    # Ensures that potential 0 is reserved for central atom
+    for (i,e) in enumerate(['CENTER'] + elts):
         d.update({e:i})
     return d
 
-def central_atom_check(atoms):
-#   Checks that some atom is the central element, and checks 
-#   that the central atom is of the type central_elt
-    atom_list = []
-
-    for (i,a) in enumerate(atom_list):
-        if (float(a[1]), float(a[2]), float(a[3])) == (0,0,0):
-            print central_elt
-            if a[0] == central_elt:
-                return True
-            return False
-    return False
-
 def shift_atoms(atoms):
-    atom_list = []
-    to_subtract = []
+    '''Finds first atom of type central_elt, moves it to
+    the front of the list, and shifts all atoms such that it 
+    is at the center.'''
+    center_index = -1
 
     # Gets shift amount by from first element listed of type central_elt
     for (i,a) in enumerate(atoms):
-        atom_list.append([a[0], float(a[1]), float(a[2]), float(a[3])])
-        if to_subtract == [] and a[0] == central_elt:
-            to_subtract = [float(a[1]), float(a[2]), float(a[3])]
+        if center_index == -1 and a[0] == central_elt:
+            center_index = i
 
-    if to_subtract == []:
+    if center_index == -1:
         raise Exception("No " + central_elt + " atom found to shift to center.")
 
-#   Will cause rounding issue if .xyz changes the standard to be more 
-#   than 5 decimal places.  
-    for atom in atom_list: 
-        atom[1] -= to_subtract[0]
-        atom[2] -= to_subtract[1]
-        atom[3] -= to_subtract[2]
-        for i in range(1,4):
-            atom[i] = format(atom[i], '.5f') 
+    center = atoms.pop(center_index)
+    atoms.insert(0, list(center))
 
-    return atom_list
+    #   Will cause rounding issue if .xyz changes the standard to be more 
+    #   than 5 decimal places.  
+    for (i,a) in enumerate(atoms): 
+        a[1] = float(a[1]) - float(center[1])
+        a[2] = float(a[2]) - float(center[2])
+        a[3] = float(a[3]) - float(center[3])
+        for i in range(1,4):
+            a[i] = format(a[i], '.5f') 
+
 
 def output(f_name):
     """ 
     Prints the .feff conversion of a given xyz file to std.out.
     """
-    atom_list = scrape_xyz(f_name)
 
-    if not central_atom_check(atom_list):
-        atom_list = shift_atoms(atom_list)
+    atom_list = scrape_xyz(f_name)
+    # Shifts first Ta atom to center and to the front
+    shift_atoms(atom_list)
+
+    # Gets elements of non-central atoms 
+    elts = elements(atom_list)
+    # And assigns non-central atoms positive potential
+    d = dictionary_from_elts(elts)
 
     print "TITLE %s\n" % os.path.basename(f_name)[:-4]
     print "CONTROL 1 1 1 1 1 1\n" \
@@ -92,29 +85,35 @@ def output(f_name):
     print "POTENTIALS\n" \
           "* potential-index   z   tag"
 
-    elts = elements(atom_list)
-    d = dictionary_from_elts(elts)
+    for (i,e) in enumerate([central_elt] + elts): 
+        atomic_num = pt.element(e).atomic
 
-    for (i,e) in enumerate(elts): 
         sys.stdout.write(' '*9)
         sys.stdout.write(str(i))
         sys.stdout.write(' '*(11-len(str(i))))
-        atomic_num = pt.element(e).atomic
         sys.stdout.write(str(atomic_num))
         sys.stdout.write(' '*(4-len(str(atomic_num))))
         sys.stdout.write(e)
+        if e == central_elt:
+            if i == 0:
+                sys.stdout.write('0')
+            else:
+                sys.stdout.write('1')
         sys.stdout.write('\n')
 
     sys.stdout.write('\n')
 
     print "ATOMS\n" \
           "* x        y        z       ipot"
-    for atom in atom_list:
-        for i in range(1,4):
-            sys.stdout.write(' '*(9-len(atom[i])))
-            sys.stdout.write(atom[i])
+    for (i, atom) in enumerate(atom_list):
+        for j in range(1,4):
+            sys.stdout.write(' '*(9-len(atom[j])))
+            sys.stdout.write(atom[j])
         sys.stdout.write(' '*3)
-        print d[atom[0]]
+        if i == 0:
+            print '0'
+        else: 
+            print d[atom[0]]
 
     sys.stdout.write('\n')
 
