@@ -1,14 +1,3 @@
-'''
-Monitors our code & docs for changes
-
-To get coverage:
-
-    python -m coverage run -m unittest discover
-    python -m coverage report -m
-        Or: `python -m coverage html`
-
-'''
-
 import os
 import sys
 import subprocess
@@ -19,17 +8,13 @@ import run_script
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+num_updates = 0
+
 def get_now():
     '''
     Get the current date and time as a string
     '''
     return datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-
-def run_tests():
-    '''
-    Run unit tests with unittest.
-    '''
-    print 'Okay'
 
 def getext(filename):
     '''
@@ -48,21 +33,19 @@ class ChangeHandler(PatternMatchingEventHandler):
         '''
         If file is changed
         '''
-        print 'Modified'
-        print event.src_path
         if getext(event.src_path) == '.xyz':
-            print '.xyz -- MODIFIED'
+            print os.path.basename(event.src_path)
+            print get_now()
+            global num_updates
+            num_updates += 1
+            print num_updates
+            run_script.update_file(os.path.basename(event.src_path))
 
     def on_created(self, event):
         '''
-        If any file or folder is created
+        If file is created
         '''
-        print 'Creation'
-        print event.src_path
-        if getext(event.src_path) == '.xyz':
-            # run_tests()
-            run_script.update_file(event.src_path)
-            print '.xyz CREATED'
+        # Subsumed within the on_modified triggers
 
 def main():
     '''

@@ -18,18 +18,18 @@ pip install -U pip
 
 Usage Notes
 ===========
-To use, run "python monitor\_changes.py".
+To use, run "python monitor\_changes.py" .  May also give the name of an alternate directory to monitor.  
 
 TODO
 ====
 - Modify setup.py file 
-- Add feff processing
-- Allow pointing of program to another folder
-- Sanitize output
+------------ Add feff processing and averaging
+- Include testfiles
+- Run atoms and feff6
 
 Known bugs
 =====
-- Repetition of processing when an old file is updated
+- Repetition of processing when an old file is updated in Vim
 
 Changelog 
 ==========

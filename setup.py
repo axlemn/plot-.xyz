@@ -7,6 +7,6 @@ setup(
     name='xyztofeff',
     version='0.1dev',
     packages=find_packages(),
-
-    install_requires=['periodic']
+    include_package_data=True,
+    install_requires=['periodic', 'watchdog']
 )

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Alexander Mun
 # 07/02/2014
 
@@ -20,12 +21,18 @@ def scrape_xyz(f_name):
     atoms = []
     for l in atom_lines:
         atoms.append(l.split())
+
+    # This never causes a crash, for some reason
+    if atoms == []:
+        raise Exception(f_name + " has no data!")
+
     return atoms
 
 def elements(atoms):
 #   Lists the elements in a list of atoms.
     elements = []
-    for a in atoms:
+    for (i,a) in enumerate(atoms):
+        if i == 0: continue;
         if a[0] not in elements:
             elements.append(a[0])
     return elements
@@ -38,22 +45,24 @@ def dictionary_from_elts(elts):
         d.update({e:i})
     return d
 
-def shift_atoms(atoms):
-    '''Finds first atom of type central_elt, moves it to
-    the front of the list, and shifts all atoms such that it 
-    is at the center.'''
-    center_index = -1
+def find_central(atoms):
+    central_list = []
 
     # Gets shift amount by from first element listed of type central_elt
     for (i,a) in enumerate(atoms):
-        if center_index == -1 and a[0] == central_elt:
-            center_index = i
+        if a[0] == central_elt:
+            central_list.append(i)
 
-    if center_index == -1:
+    if central_list == []:
         raise Exception("No " + central_elt + " atom found to shift to center.")
 
-    center = atoms.pop(center_index)
-    atoms.insert(0, list(center))
+    return central_list
+
+def shift_atoms(atoms, center_index):
+    '''Finds nth atom of type central_elt, and shifts all atoms such that it 
+    is at the center.'''
+
+    center = atoms[center_index]
 
     #   Will cause rounding issue if .xyz changes the standard to be more 
     #   than 5 decimal places.  
@@ -64,15 +73,11 @@ def shift_atoms(atoms):
         for i in range(1,4):
             a[i] = format(a[i], '.5f') 
 
-
-def output(f_name):
+def output(atom_list, center_index):
     """ 
     Prints the .feff conversion of a given xyz file to std.out.
+    The first atom is assumed to be the central atom.
     """
-
-    atom_list = scrape_xyz(f_name)
-    # Shifts first Ta atom to center and to the front
-    shift_atoms(atom_list)
 
     # Gets elements of non-central atoms 
     elts = elements(atom_list)
@@ -94,7 +99,9 @@ def output(f_name):
         sys.stdout.write(str(atomic_num))
         sys.stdout.write(' '*(4-len(str(atomic_num))))
         sys.stdout.write(e)
-        if e == central_elt:
+
+        # Fixes central element to potential 0
+        if central_elt in elts and e == central_elt:
             if i == 0:
                 sys.stdout.write('0')
             else:
@@ -110,7 +117,7 @@ def output(f_name):
             sys.stdout.write(' '*(9-len(atom[j])))
             sys.stdout.write(atom[j])
         sys.stdout.write(' '*3)
-        if i == 0:
+        if i == center_index:
             print '0'
         else: 
             print d[atom[0]]
@@ -124,4 +131,10 @@ if __name__ == '__main__':
     if len(args) != 2:
         print 'Usage error.'
     f_name = args[1]
-    output(f_name)
+    atom_list = scrape_xyz(f_name)
+
+    potential_centers = (find_central(atom_list))
+    # Shifts each Ta atom to center in turn
+    for i in range(len(potential_centers)):
+        shift_atoms(atom_list, potential_centers[i])
+        output(atom_list, potential_centers[i])
