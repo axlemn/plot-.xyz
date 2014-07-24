@@ -1,6 +1,9 @@
 # 07/07/14
 # Alexander Mun
 
+import periodic
+import watchdog.observers
+import watchdog.events
 from setuptools import setup, find_packages
 
 setup(

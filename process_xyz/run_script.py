@@ -5,6 +5,7 @@
 # updated, as specified
 
 from subprocess import call, PIPE
+import shutil
 import os
 import errno
 
@@ -21,14 +22,15 @@ def update_files(to_update):
 
 
 def update_file(f):
+    '''The main function, which calls subprocesses and directs what will 
+    be done to input file f on update.  Forms necessary metadata.'''
     num_runs = 0
     num_center_atoms = 1
     while num_runs < num_center_atoms:
         run_feff(f, num_runs)
-
         # Gets num_center_atoms from temp.txt file
         if num_runs == 0:
-            file_path = get_dir_name(f) + "temp.txt"
+            file_path = get_dir_name(f, "temp.txt")
             temp = open(file_path, 'r')
             print 'Debug'
             for l in temp:
@@ -37,8 +39,19 @@ def update_file(f):
                     num_center_atoms = int(l.split('=')[1].split()[0])
 
         num_runs += 1
-    # Remove the dud directory created, with the invalid feff.inp file
-    print('Updated ' + f)
+
+    # Moves path files
+    path_files = get_dir_name(f, "paths")
+    make_sure_path_exists(path_files)
+    for i in range(0, num_center_atoms):
+        shutil.copyfile( get_dir_name(f, i) + "/paths.dat", 
+                       path_files + "/paths"+str(i)+".dat" )
+
+    # Removes obsolete directories 
+    for x in os.walk(get_dir_name(f)):
+        x_base = os.path.basename(x[0])
+        if x_base.isdigit() and int(x_base) >= num_center_atoms:
+            shutil.rmtree(x[0])
 
 def get_dir_name(f, *args):
     base = os.path.basename(f)

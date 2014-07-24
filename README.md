@@ -2,6 +2,10 @@ Description
 ===========
 Monitors a directory for changes to or new .xyz files and then runs feff6 on them, once for each Tantalum atom present.  Does not trigger when a file is moved into the directory.  
 
+monitor\_changes.py runs an instance of watchdog, 
+run\_script.py manages the data pipeline.  
+xyz\_to\_feff.py manages data conversion.
+
 Installation
 ===========
 Download the .tar.gz file under dist via the "View Raw" option.
@@ -23,18 +27,17 @@ pip install -U pip
 
 
 TODO
-====
-- Modify setup.py file 
+----
+- Modify setup.py file to include testfiles and check package installation
 - Add feff processing and averaging
 - Make output more sensible
-- Include testfiles
 
 Known bugs
-=====
+----
 - Processing when an old file is updated in Vim
 
 Changelog 
-==========
+----
 - Deleted any use of a timestamp file, replacing it with an instance of watchdog.  
 - Changed output files
 - Modified checks to the .xyz file
