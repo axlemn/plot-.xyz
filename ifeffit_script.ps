@@ -1,0 +1,28 @@
+use Ifeffit;
+$dir_name = "/home/alex/Summer/process_xyz/AllTetrahedral/";
+$atom_index = 0;
+$max_index = 2;
+@index = (1..$max_index);
+foreach my $i (@index) {
+@a[0] = ifeffit("path(" . $i . ", file = " . 
+    $dir_name . 
+    $atom_index . 
+    "/feff" . 
+    sprintf("%04d", $i) .
+    ".dat)");
+}
+$a = "";
+foreach my $j (@index) {
+    if ($j > "1") {
+        $a .= ", $j";
+    } else {
+        $a = "1";
+    }
+}
+print $a;
+@a[2] = ifeffit("ff2chi(" .
+    $a . 
+    ", group = ff)");
+@a[3] = ifeffit("show ff.chi");
+@a[4] = ifeffit("show ff.k");
+@a[5] = ifeffit("plot(ff.k, ff.chi)");
