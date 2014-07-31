@@ -8,6 +8,7 @@ from subprocess import call, PIPE
 import shutil
 import os
 import errno
+import time
 
 def make_sure_path_exists(path):
     try:
@@ -24,11 +25,14 @@ def update_files(to_update):
 def update_file(f):
     '''The main function, which calls subprocesses and directs what will 
     be done to input file f on update.  Forms necessary metadata.'''
+
+    # Runs feff6, gets metadata, then runs ifeffit
     num_runs = 0
     num_center_atoms = 1
     while num_runs < num_center_atoms:
         run_feff(f, num_runs)
-        # Gets num_center_atoms from temp.txt file
+
+        # If not done already, gets num_center_atoms from temp.txt file
         if num_runs == 0:
             file_path = get_dir_name(f, "temp.txt")
             temp = open(file_path, 'r')
@@ -37,6 +41,13 @@ def update_file(f):
                 # Checks first word before an = on a line 
                 if l.split('=')[0].split()[0] == 'num_center_atoms':
                     num_center_atoms = int(l.split('=')[1].split()[0])
+
+        # Calls ifeffit_script.ps
+        time.sleep(2)
+        run_ifeffit(f, num_runs)
+        print "================"
+        print num_runs
+        print "================"
 
         num_runs += 1
 
@@ -65,18 +76,18 @@ def get_dir_name(f, *args):
         return d +  "/" + base[:-4] + "/" + str(args[0])
     return d +  "/" + base[:-4] + "/"
 
-def run_feff(f, an_int):
+def run_feff(f, run_index):
     '''Creates directory, runs chain of commands on file and puts 
     output files in said directory'''
 
     # Making directory
-    new_dir = get_dir_name(f, an_int)
+    new_dir = get_dir_name(f, run_index)
     make_sure_path_exists(new_dir)
 
     # Piping output of xyz_to_feff
     f_name = new_dir + '/feff.inp'
     output_f = open(f_name, 'w')
-    call(['python', 'xyz_to_feff.py', f, str(an_int)],\
+    call(['python', 'xyz_to_feff.py', f, str(run_index)],\
         stdout=output_f, stderr = PIPE)
     output_f.close()
 
@@ -84,6 +95,10 @@ def run_feff(f, an_int):
     os.chdir(new_dir)
     call(['feff6', f_name])
     os.chdir(working_dir)
+
+def run_ifeffit(f, run_index):
+    print ['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)]
+    call(['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)])
 
 if __name__ == '__main__':
     dirname = sys.argv[1]

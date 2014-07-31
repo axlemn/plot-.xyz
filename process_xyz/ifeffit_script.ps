@@ -1,16 +1,24 @@
 use Ifeffit;
-$dir_name = "/home/alex/Summer/process_xyz/AllTetrahedral/";
-$atom_index = 0;
+# Take in dir_name
+$dir_name = $ARGV[0];
+print $dir_name;
+# Get info for directory.
+
+#opendir my $dir, $dir_name or die "Cannot open directory: $!";
+#my @files = readdir $dir;
+#closedir $dir;
+
 $max_index = 2;
 @index = (1..$max_index);
+
 foreach my $i (@index) {
 @a[0] = ifeffit("path(" . $i . ", file = " . 
     $dir_name . 
-    $atom_index . 
     "/feff" . 
     sprintf("%04d", $i) .
     ".dat)");
 }
+
 $a = "";
 foreach my $j (@index) {
     if ($j > "1") {
@@ -20,6 +28,7 @@ foreach my $j (@index) {
     }
 }
 print $a;
+
 @a[2] = ifeffit("ff2chi(" .
     $a . 
     ", group = ff)");
