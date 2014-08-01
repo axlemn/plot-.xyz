@@ -1,15 +1,26 @@
+#!/usr/bin/perl
+
 use Ifeffit;
 # Take in dir_name
 $dir_name = $ARGV[0];
-print $dir_name;
-# Get info for directory.
+@index = ();
 
-#opendir my $dir, $dir_name or die "Cannot open directory: $!";
-#my @files = readdir $dir;
-#closedir $dir;
+# Get number of feff data files in directory.
+opendir(DIR, $dir_name) or die $!; 
 
-$max_index = 2;
-@index = (1..$max_index);
+while (my $_ = readdir(DIR)) {
+
+    # Only want files
+    next unless (-f "$dir_name/$_");
+    # Use a regular expression to find files
+    if (/feff(\d{4}).dat/) {
+        my $num = $1;
+        push(@index, $num);
+    }
+
+    $max_index += 1;
+}
+closedir(DIR);
 
 foreach my $i (@index) {
 @a[0] = ifeffit("path(" . $i . ", file = " . 
