@@ -6,10 +6,13 @@ Made to work in \*nix.
 
 Summary of each file:
 ------------------
-monitor\_changes.py runs an instance of watchdog, 
+monitor\_changes.py runs an instance of watchdog. 
 run\_script.py manages the data piping.  
-xyz\_to\_feff.py manages data conversion.
-ifeffit\_script.ps runs ifeffit.
+xyz\_to\_feff.py manages data conversion.  
+ifeffit\_script.ps runs ifeffit.  If you want to see what commands are run on which .dat files, look at the end of this file.  
+
+To ignore the automatic detection and manually run the data processing on a file, navigate to the process\_xyz folder and run:
+python -c "from run\_script import update\_file; update\_file(FILENAME)"
 
 Installation
 ===========
