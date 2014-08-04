@@ -41,7 +41,7 @@ class ChangeHandler(PatternMatchingEventHandler):
             global num_updates
             num_updates += 1
             print num_updates
-            run_script.update_file(os.path.basename(event.src_path))
+            run_script.update_file(event.src_path)
 
     def on_created(self, event):
         '''

@@ -48,10 +48,12 @@ TODO:
 Known issues
 ----
 - Processing multiple times when an old file is updated in Vim (this is a watchdog quirk, unique to Vim)
-- Some files are not read from general locations, causing issues if a folder other than the default is monitored
+- Something similar has begun to happen in emacs (uncertain how general)
+- If script is cancelled too soon after plots are closed, many instances of "RuntimeError('main thread is not in main loop',)" appear.  This threading issue is also occurring behind the scenes with watchdog and Tkinter.
 
 Changelog 
 ----
+- Fixed issue with selecting other directories to monitor
 - Replaced pgplot graphing with matplotlib
 - Added perl ifeffit script and functionality
 - Added creation of subdirectories and runs processing for each Ta atom

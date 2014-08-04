@@ -10,6 +10,7 @@ import os
 import errno
 import time
 import matplotlib_script as mpl
+import threading
 
 def make_sure_path_exists(path):
     try:
@@ -18,19 +19,17 @@ def make_sure_path_exists(path):
         if exception.errno != errno.EEXIST:
             raise
 
-def update_files(to_update):
-    for f in to_update:
-        update_file(f)
-
-
 def update_file(f):
     '''The main function, which calls subprocesses and directs what will 
     be done to input file f on update.  Forms necessary metadata.'''
+
+    print "Updating file " + f
 
     # Runs feff6, gets metadata, then runs ifeffit
     num_runs = 0
     num_center_atoms = 1
     while num_runs < num_center_atoms:
+        print "Running feff: run number " + str(num_runs)
         run_feff(f, num_runs)
 
         # If not done already, gets num_center_atoms from temp.txt file
@@ -51,15 +50,17 @@ def update_file(f):
 
         num_runs += 1
 
-        # Displays ifeffit results via matplotlib_script.py
-        mpl.main()
-
-    # Moves path files
+    # Moves path files; NOTE THIS IS VERY REDUNDANT, TO FIX
+    f_list = []
     path_files = get_dir_name(f, "paths")
     make_sure_path_exists(path_files)
     for i in range(0, num_center_atoms):
-        shutil.copyfile( get_dir_name(f, i) + "/paths.dat", 
-                       path_files + "/paths"+str(i)+".dat" )
+        shutil.copyfile( get_dir_name(f, i) + "/ifeffit_out", 
+                       path_files + "/ifeffit_out" + str(i))
+        f_list.append(path_files + "/ifeffit_out" + str(i))
+
+    # Displays ifeffit results via matplotlib_script.py
+    mpl.main(f_list)
 
     # Removes obsolete directories 
     for x in os.walk(get_dir_name(f)):
@@ -90,6 +91,12 @@ def run_feff(f, run_index):
     # Piping output of xyz_to_feff
     f_name = new_dir + '/feff.inp'
     output_f = open(f_name, 'w')
+
+    print "first converting xyz file..."
+    print "calling",
+    print ['python', 'xyz_to_feff.py', f, str(run_index)]
+    print "to file " + f_name
+    
     call(['python', 'xyz_to_feff.py', f, str(run_index)],\
         stdout=output_f, stderr = PIPE)
     output_f.close()
@@ -100,19 +107,9 @@ def run_feff(f, run_index):
     os.chdir(working_dir)
 
 def run_ifeffit(f, run_index):
+    '''Runs ifeffit_script.ps on dir with data from feff that has the run_index      atom in the center'''
     print ['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)]
     call(['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)])
 
 if __name__ == '__main__':
-    dirname = sys.argv[1]
-    if len(sys.argv) == 3:
-        ts_file = sys.argv[2]
-    else: 
-        ts_file = default_ts_file
-
-    curr_stamps = get_stamps(dirname)
-    old_stamps  = open_records(ts_file)
-    to_update = stamps_to_files(curr_stamps - old_stamps)
-
-    update_files(to_update)
-    store_stamps(curr_stamps, ts_file)
+    pass
