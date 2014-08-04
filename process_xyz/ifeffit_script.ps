@@ -5,14 +5,14 @@ use Ifeffit;
 $dir_name = $ARGV[0];
 @index = ();
 
-# Get number of feff data files in directory.
+# Get names of feff data files in directory.
 opendir(DIR, $dir_name) or die $!; 
 
+# Some extra splicing
 while (my $_ = readdir(DIR)) {
-
     # Only want files
     next unless (-f "$dir_name/$_");
-    # Use a regular expression to find files
+    # Fitting the following regex
     if (/feff(\d{4}).dat/) {
         my $num = $1;
         push(@index, $num);
@@ -22,6 +22,7 @@ while (my $_ = readdir(DIR)) {
 }
 closedir(DIR);
 
+# Loading paths from file
 foreach my $i (@index) {
 @a[0] = ifeffit("path(" . $i . ", file = " . 
     $dir_name . 
@@ -32,17 +33,20 @@ foreach my $i (@index) {
 
 $a = "";
 foreach my $j (@index) {
-    if ($j > "1") {
-        $a .= ", $j";
-    } else {
-        $a = "1";
-    }
+    $a .= "$j ,";
 }
-print $a;
+
+print "\nff2chi(" .
+    $a . 
+    "group = ff)\n";
 
 @a[2] = ifeffit("ff2chi(" .
     $a . 
     ", group = ff)");
-@a[3] = ifeffit("show ff.chi");
-@a[4] = ifeffit("show ff.k");
-@a[5] = ifeffit("plot(ff.k, ff.chi)");
+#@a[3] = ifeffit("show ff.chi");
+#@a[4] = ifeffit("show ff.k");
+#@a[5] = ifeffit("plot(ff.k)");
+print "\nPlotting ff.chi...\n";
+@a[5] = ifeffit("plot(ff.chi)");
+#print "\nPlotting ff.k...\n";
+#@a[5] = ifeffit("plot(ff.k)");
