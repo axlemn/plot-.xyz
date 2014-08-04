@@ -40,19 +40,19 @@ pip install -U pip
 
 ifeffit and perl are also assumed to be installed, both of which can be installed through your package manager.  
 
-TODO
-----
+TODO:
 - Modify setup.py file to check package installation
 - Add feff averaging
 - Clean output 
 
 Known issues
 ----
-- Processing multiple times when an old file is updated in Vim (this is a watchdog quirk, and appears unique to Vim)
-- Only one pgplot window will stay open at a time, current solution is to present each at a 2 second time delay (which is set in run\_script.py)
+- Processing multiple times when an old file is updated in Vim (this is a watchdog quirk, unique to Vim)
+- Some files are not read from general locations, causing issues if a folder other than the default is monitored
 
 Changelog 
 ----
+- Replaced pgplot graphing with matplotlib
 - Added perl ifeffit script and functionality
 - Added creation of subdirectories and runs processing for each Ta atom
 

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
-def main():
-    f_name = "data.tmp"
+def make_window(f_name):
+    plt.figure()
     x = []
     y = []
     f = open(f_name, 'r+')
@@ -13,8 +13,9 @@ def main():
         x.append(float(s[0]))
         y.append(float(s[1]))
     plt.plot(x, y)
-    plt.show()
     f.close()
 
-if __name__ == '__main__':
-    main()
+def main(f_list):
+    for f_name in f_list:
+        make_window(f_name)
+    plt.show()

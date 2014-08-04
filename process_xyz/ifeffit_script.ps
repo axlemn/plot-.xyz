@@ -46,6 +46,6 @@ print "\nff2chi(" .
 #@a[3] = ifeffit("show ff.chi");
 #@a[4] = ifeffit("show ff.k");
 #@a[5] = ifeffit("plot(ff.k)");
-print "\nPlotting ff.chi...\n";
-@a[5] = ifeffit("plot(ff.chi)");
-@a[6] = ifeffit("write_data(file=data.tmp, ff.k, ff.chi)");
+#print "\nPlotting ff.chi...\n";
+#@a[5] = ifeffit("plot(ff.chi)");
+@a[6] = ifeffit("write_data(file=$dir_name/ifeffit_out, ff.k, ff.chi)");
