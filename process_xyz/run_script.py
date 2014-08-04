@@ -9,6 +9,7 @@ import shutil
 import os
 import errno
 import time
+import matplotlib_script as mpl
 
 def make_sure_path_exists(path):
     try:
@@ -43,13 +44,15 @@ def update_file(f):
                     num_center_atoms = int(l.split('=')[1].split()[0])
 
         # Calls ifeffit_script.ps
-        time.sleep(2)
         run_ifeffit(f, num_runs)
         print "================"
         print num_runs
         print "================"
 
         num_runs += 1
+
+        # Displays ifeffit results via matplotlib_script.py
+        mpl.main()
 
     # Moves path files
     path_files = get_dir_name(f, "paths")

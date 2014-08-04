@@ -48,5 +48,4 @@ print "\nff2chi(" .
 #@a[5] = ifeffit("plot(ff.k)");
 print "\nPlotting ff.chi...\n";
 @a[5] = ifeffit("plot(ff.chi)");
-#print "\nPlotting ff.k...\n";
-#@a[5] = ifeffit("plot(ff.k)");
+@a[6] = ifeffit("write_data(file=data.tmp, ff.k, ff.chi)");
