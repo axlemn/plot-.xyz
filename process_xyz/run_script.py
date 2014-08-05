@@ -4,7 +4,7 @@
 # Calls some terminal command on all files which need to be 
 # updated, as specified
 
-from subprocess import call, PIPE
+import subprocess
 import shutil
 import os
 import errno
@@ -61,14 +61,17 @@ def update_file(f):
                        path_files + "/ifeffit_out" + str(i))
         f_list.append(path_files + "/ifeffit_out" + str(i))
 
-    # Averages together .chi files from ifeffit
-    mpl.avg(f_list, get_dir_name(f))
+ #  # Averages together .chi files from ifeffit
+ #  mpl.avg(f_list, get_dir_name(f))
 
-    # Displays avg
-    mpl.display_avg(get_dir_name(f))
+ #  # Displays avg
+ #  mpl.display_avg(get_dir_name(f))
 
-    # Displays ifeffit results via matplotlib_script.py
-    mpl.main(f_list)
+ #  # Displays ifeffit results via matplotlib_script.py
+ #  mpl.main(f_list)
+
+    subprocess.Popen(['python', 'matplotlib_script.py',
+         get_dir_name(f)] + f_list)
 
     # Removes obsolete directories 
     for x in os.walk(get_dir_name(f)):
@@ -105,19 +108,19 @@ def run_feff(f, run_index):
     print ['python', 'xyz_to_feff.py', f, str(run_index)]
     print "to file " + f_name
     
-    call(['python', 'xyz_to_feff.py', f, str(run_index)],\
-        stdout=output_f, stderr = PIPE)
+    subprocess.call(['python', 'xyz_to_feff.py', f, str(run_index)],\
+        stdout=output_f, stderr = subprocess.PIPE)
     output_f.close()
 
     working_dir = os.getcwd()
     os.chdir(new_dir)
-    call(['feff6', f_name])
+    subprocess.call(['feff6', f_name])
     os.chdir(working_dir)
 
 def run_ifeffit(f, run_index):
     '''Runs ifeffit_script.ps on dir with data from feff that has the run_index      atom in the center'''
     print ['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)]
-    call(['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)])
+    subprocess.call(['perl', 'ifeffit_script.ps', get_dir_name(f, run_index)])
 
 if __name__ == '__main__':
     pass

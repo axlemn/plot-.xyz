@@ -35,12 +35,15 @@ class ChangeHandler(PatternMatchingEventHandler):
         If file is changed
         '''
         if getext(event.src_path) == '.xyz':
-            print os.path.basename(event.src_path)
+            print "============================================="
             print get_now()
+            print "Change detected in file:",
+            print os.path.basename(event.src_path)
             global num_updates
             num_updates += 1
-            print num_updates
-            run_script.update_file(event.src_path)
+            print "change number : " + str(num_updates)
+            print "============================================="
+#           run_script.update_file(event.src_path)
 
     def on_created(self, event):
         '''

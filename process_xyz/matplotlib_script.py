@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import sys
 
 avg_f = "avg_f.txt"
 
@@ -77,3 +78,11 @@ def main(f_list):
     for f_name in f_list:
         make_window(f_name)
     plt.show()
+
+if __name__ == '__main__':
+    dir_name = sys.argv[1]
+    f_list = sys.argv[2:]
+
+    avg(f_list, dir_name)
+    display_avg(dir_name)
+    main(f_list)
