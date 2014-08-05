@@ -43,7 +43,7 @@ class ChangeHandler(PatternMatchingEventHandler):
             num_updates += 1
             print "change number : " + str(num_updates)
             print "============================================="
-#           run_script.update_file(event.src_path)
+            run_script.update_file(event.src_path)
 
     def on_created(self, event):
         '''
@@ -59,7 +59,7 @@ def main():
 
     path = sys.argv[1] if len(sys.argv) > 1 else '.'
     event_handler = ChangeHandler()
-    observer = Observer()
+    observer = Observer(timeout=100)
     observer.schedule(event_handler, path, recursive=True)
     observer.start()
     try:
