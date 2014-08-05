@@ -27,9 +27,13 @@ def update_file(f):
 
     # Runs feff6, gets metadata, then runs ifeffit
     num_runs = 0
+    # num_center_atoms is set within the loop, so setting up a 
+    # for loop is not possible
     num_center_atoms = 1
     while num_runs < num_center_atoms:
+        print "================"
         print "Running feff: run number " + str(num_runs)
+        print "================"
         run_feff(f, num_runs)
 
         # If not done already, gets num_center_atoms from temp.txt file
@@ -44,9 +48,7 @@ def update_file(f):
 
         # Calls ifeffit_script.ps
         run_ifeffit(f, num_runs)
-        print "================"
         print num_runs
-        print "================"
 
         num_runs += 1
 
@@ -58,6 +60,12 @@ def update_file(f):
         shutil.copyfile( get_dir_name(f, i) + "/ifeffit_out", 
                        path_files + "/ifeffit_out" + str(i))
         f_list.append(path_files + "/ifeffit_out" + str(i))
+
+    # Averages together .chi files from ifeffit
+    mpl.avg(f_list, get_dir_name(f))
+
+    # Displays avg
+    mpl.display_avg(get_dir_name(f))
 
     # Displays ifeffit results via matplotlib_script.py
     mpl.main(f_list)
