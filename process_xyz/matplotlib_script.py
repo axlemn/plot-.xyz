@@ -77,7 +77,11 @@ def make_window(f_name):
 def main(f_list):
     for f_name in f_list:
         make_window(f_name)
-    plt.show()
+    try:
+        plt.show()
+    except KeyboardInterrupt:
+        print "Plots closed by KeyboardInterrupt."
+        exit(0)
 
 if __name__ == '__main__':
     dir_name = sys.argv[1]
