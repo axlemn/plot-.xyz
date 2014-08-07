@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 import sys
+import subprocess
+import os
 
-avg_f = "avg_f.txt"
+default_chi_k = "chi.k"
+default_chi_r = "chi.r"
 
-def display_avg(dir_name):
-    make_window(dir_name + '/' + avg_f)
+def display_avg(dirname):
+    make_window(dirname + '/' + default_chi_k)
 
-def show():
-    plt.show()
-
-def avg(f_list, dir_name):
+def avg(f_list, dirname):
     count = len(f_list)
     d = {}
     d_init_flag = True
@@ -39,7 +39,7 @@ def avg(f_list, dir_name):
     for (i, key) in enumerate(sorted_keys):
         sorted_keys[i] = (key, d[key])
 
-    f = open(dir_name + '/' + avg_f, 'w')
+    f = open(dirname + '/' + default_chi_k, 'w')
     f.write("#----------------\n")
     f.write("#   k         chi\n")
     for (x,y) in sorted_keys:
@@ -61,8 +61,16 @@ def avg(f_list, dir_name):
         f.write("\n")
     f.close()
 
-def make_window(f_name):
+def make_window(f_name, **window_info):
     plt.figure()
+    fig = plt.gcf()
+    fig.canvas.set_window_title(os.path.basename(f_name))
+    plt.title(os.path.basename(f_name))
+    for attr in window_info:
+        if hasattr(plt, str(attr)):
+            m = getattr(plt, str(attr))
+            m(window_info[str(attr)])
+
     x = []
     y = []
     f = open(f_name, 'r+')
@@ -75,6 +83,12 @@ def make_window(f_name):
     plt.plot(x, y)
     f.close()
 
+def find_chir(dirname, chi_k=default_chi_k, chi_r=default_chi_r):
+    '''Plots a Re[chi(r)] plot given a directory and the filename of a 
+    chi(k) plot.'''
+    print ['perl', 'chir.ps', dirname, chi_k, chi_r]
+    subprocess.call(['perl', 'chir.ps', dirname, chi_k, chi_r])
+
 def main(f_list):
     for f_name in f_list:
         make_window(f_name)
@@ -85,9 +99,10 @@ def main(f_list):
         exit(0)
 
 if __name__ == '__main__':
-    dir_name = sys.argv[1]
+    dirname = os.path.abspath(sys.argv[1])
     f_list = sys.argv[2:]
-
-    avg(f_list, dir_name)
-    display_avg(dir_name)
-    main(f_list)
+    avg(f_list, dirname)
+    display_avg(dirname)
+    find_chir(dirname)
+    make_window(dirname + '/' + default_chi_r)
+    plt.show()

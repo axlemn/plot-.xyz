@@ -13,22 +13,33 @@ import matplotlib_script as mpl
 import threading
 
 def make_sure_path_exists(path):
+    '''Creates a directory if it did not previously exist.'''
     try:
         os.makedirs(path)
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
 
+def get_dirname(f, subdir=""):
+    '''Takes in a filename, and returns the pathname to use to hold
+    all files relating to it.'''
+    base = os.path.basename(f)
+
+    if base == "":
+        raise Exception("Tried to update an invalid path name!")
+
+    d = os.path.dirname(os.path.abspath(f))
+    return d +  "/" + base[:-4] + "/" + str(subdir)
+
 def update_file(f):
-    '''The main function, which directs what is to be done to input 
-    file f on update.'''
+    '''The main function.  This directs what is to be done to input 
+    file f on update.  '''
 
     def read_num_center_atoms(f):
-        '''Looks in f's directory for a temp.txt file, looks for 
-        the number of center atoms, and returns the number.'''
+        '''Looks in f's directory for a temp.txt file, and from it reads
+        and returns the number of center atoms.'''
         file_path = get_dirname(f, "temp.txt")
         temp = open(file_path, 'r')
-        print 'Debug'
         for l in temp:
             # Checks if the part of a string appearing 
             # before an = on a line is 'num_center_atoms'
@@ -43,23 +54,21 @@ def update_file(f):
         subprocess.call(['perl', 'ifeffit_script.ps', \
             get_dirname(f, run_index)])
 
-    def stop():
-        while True: pass;
-
     ##############
     # Main loop:
     ##############
+    # Tracks how many times feff has been run:
     num_runs = 0
-    # num_center_atoms is set within the loop, so setting up a 
-    # for loop is not possible
+    # num_center_atoms is set within the loop, initializing 
+    # arbitrarily so preconditions are met
     num_center_atoms = 1
     while num_runs < num_center_atoms:
-        print "================"
-        print "Running feff, round " + str(num_runs) + "..."
-        convert_and_sort(f, num_runs)
+
+        # Subdirectories made, xyz_to_feff called, feff called:
+        # if num_runs == 0, records num_center_atoms in temp.txt file
         run_feff(f, num_runs)
 
-        # If not done already, gets num_center_atoms from temp.txt file
+        # If not done already, gets num_center_atoms via the temp.txt file
         if num_runs == 0:
             num_center_atoms = read_num_center_atoms(f)
 
@@ -69,6 +78,7 @@ def update_file(f):
     ##############
 
     # Moves path files; NOTE THIS IS VERY REDUNDANT, TO FIX
+    # Should instead create path files in correct place
     f_list = []
     path_files = get_dirname(f, "paths")
     make_sure_path_exists(path_files)
@@ -77,74 +87,47 @@ def update_file(f):
                        path_files + "/ifeffit_out" + str(i))
         f_list.append(path_files + "/ifeffit_out" + str(i))
 
- #  # Averages together .chi files from ifeffit
- #  mpl.avg(f_list, get_dirname(f))
-
- #  # Displays avg
- #  mpl.display_avg(get_dirname(f))
-
- #  # Displays ifeffit results via matplotlib_script.py
- #  mpl.main(f_list)
-
+    # Opens subprocess via Popen to prevent matplotlib graphs from blocking 
+    # loops in superprocesses.  Graphs are created and plotted:
     subprocess.Popen(['python', 'matplotlib_script.py',
          get_dirname(f)] + f_list)
 
+    # Removes some obsolete files
     clean(f, num_center_atoms)
 
 def clean(f, num_center_atoms):
-    # Removes directories referring to Ta atoms which no longer exist
+    ' Removes directories referring to Ta atoms which no longer exist. '
     for x in os.walk(get_dirname(f)):
         x_base = os.path.basename(x[0])
         if x_base.isdigit() and int(x_base) >= num_center_atoms:
             shutil.rmtree(x[0])
 
-def get_dirname(f, *args):
-    base = os.path.basename(f)
-
-    if base == "":
-        raise Exception("Tried to update an invalid path name!")
-
-    d = os.path.dirname(os.path.abspath(f))
-
-    if len(args) > 0:
-        return d +  "/" + base[:-4] + "/" + str(args[0])
-    return d +  "/" + base[:-4] + "/"
-
-def convert_and_sort(f, num_runs):
-    pass
-
 def run_feff(f, run_index):
-    '''Creates directory, runs chain of commands on file and puts 
-    output files in said directory'''
+    '''Creates a directory based on the run index (name determined via 
+    get_dirname(f, run_index)), passes the run_index to xyz_to_feff.py, 
+    and pipes the output into said directory.  Moves to the directory, 
+    runs feff, and moves back.'''
 
-    # Making directory
+    # Making subdirectory for a fixed run index
     new_dir = get_dirname(f, run_index)
     make_sure_path_exists(new_dir)
 
-    # Piping output of xyz_to_feff
+    # Piping output of xyz_to_feff into subdirectory with the name 'feff.inp'
     f_name = new_dir + '/feff.inp'
     output_f = open(f_name, 'w')
-
-    print "first converting xyz file..."
-    print "calling",
-    print ['python', 'xyz_to_feff.py', f, str(run_index)]
-    print "to file " + f_name
-    
+    print "Converting xyz file...\n Writing output of "
+    print "  python xyz_to_feff.py " + f + ' ' + str(run_index) 
+    print " to file " + f_name
     subprocess.call(['python', 'xyz_to_feff.py', f, str(run_index)],\
         stdout=output_f, stderr = subprocess.PIPE)
     output_f.close()
 
+    # Calls feff
+    print "Calling feff, run index " + str(run_index) + "..."
     working_dir = os.getcwd()
     os.chdir(new_dir)
     subprocess.call(['feff6', f_name])
     os.chdir(working_dir)
-
-def plot_chir(f, chi_k='avg_f.txt'):
-    dirname = get_dirname(f)
-    '''Plots a Re[chi(r)] plot given a directory and the filename of a 
-    chi(k) plot.'''
-    print ['perl', 'chir.ps', os.path.abspath(dirname), chi_k]
-    subprocess.call(['perl', 'chir.ps', dirname, chi_k])
 
 if __name__ == '__main__':
     pass

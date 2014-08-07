@@ -2,7 +2,7 @@
 # Alexander Mun
 # 07/02/2014
 
-from run_script import get_dir_name
+from run_script import get_dirname
 import periodic as pt
 import sys
 import re
@@ -92,7 +92,7 @@ def output(f_name, n):
     atom_list = scrape_xyz(f_name)
 
     if n == 0:
-        temp = open(get_dir_name(f_name) + 'temp.txt', 'w')
+        temp = open(get_dirname(f_name) + 'temp.txt', 'w')
         temp.write('num_center_atoms = ' + str(num_central(atom_list)))
 
     # n is an index

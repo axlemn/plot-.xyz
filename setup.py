@@ -2,6 +2,7 @@
 # Alexander Mun
 
 import periodic
+import matplotlib.pyplot
 from setuptools import setup, find_packages
 
 setup(
