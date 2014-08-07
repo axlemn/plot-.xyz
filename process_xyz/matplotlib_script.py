@@ -40,6 +40,7 @@ def avg(f_list, dir_name):
         sorted_keys[i] = (key, d[key])
 
     f = open(dir_name + '/' + avg_f, 'w')
+    f.write("#----------------\n")
     f.write("#   k         chi\n")
     for (x,y) in sorted_keys:
         split_key = str(x).split('.')
