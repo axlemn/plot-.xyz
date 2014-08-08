@@ -30,7 +30,7 @@ To test, copy a valid .xyz file into the watched directory (sample .xyz files ca
 
 The xyz\_to\_feff program requires a couple of python packages, both of which can be installed via pip. 
 pip install periodic
-pip install watchdog
+pip install matplotlib
 
 pip itself may be installed on Unix systems via:
 pip install -U pip
