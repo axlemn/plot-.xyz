@@ -77,22 +77,20 @@ def update_file(f):
         num_runs += 1
     ##############
 
-    # Moves path files; NOTE THIS IS VERY REDUNDANT, TO FIX
-    # Should instead create path files in correct place
+    ## Gathering and averaging chi(k) ##
     f_list = []
-    path_files = get_dirname(f, "paths")
-    make_sure_path_exists(path_files)
+    unaveraged_chik = get_dirname(f, "paths")
+    make_sure_path_exists(unaveraged_chiks)
     for i in range(0, num_center_atoms):
-        shutil.copyfile( get_dirname(f, i) + "/ifeffit_out", 
-                       path_files + "/ifeffit_out" + str(i))
-        f_list.append(path_files + "/ifeffit_out" + str(i))
+        f_list.append( get_dirname(f, i) + "/ifeffit_out", 
 
+    ### Graphing and plotting in matplotlib: ###
     # Opens subprocess via Popen to prevent matplotlib graphs from blocking 
     # loops in superprocesses.  Graphs are created and plotted:
     subprocess.Popen(['python', 'matplotlib_script.py',
          get_dirname(f)] + f_list)
 
-    # Removes some obsolete files
+    ### Cleanup ###
     clean(f, num_center_atoms)
 
 def clean(f, num_center_atoms):

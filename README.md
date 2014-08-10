@@ -4,12 +4,14 @@ When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplot
 
 Made to work in \*nix.
 
-Summary of each file:
+Summary of each file (in order of usage):
 ------------------
 - timestamps.py initializes and watches a file storing a list of file names and their last modified times. 
-- run\_script.py manages the data piping.  
-- xyz\_to\_feff.py manages data conversion.  
-- ifeffit\_script.ps runs ifeffit.  If you want to see what commands are run on which .dat files, look at the end of this file.  
+- run\_script.py manages the data piping.  update\_file is the main function.  
+- xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (zero-indexed).  
+- ifeffit\_script.ps takes feff####.dat files in a directory and writes a file containing chi(k) file.  
+- matplotlib\_script.py averages chi(k) files, and controls what matplotlib will eventually plot.
+- chir.ps converts chi.k files to chi.r files.  
 
 To ignore automatic detection and manually run the data processing on a specific file, navigate to the process\_xyz folder and run:
 python -c "from run\_script import update\_file; update\_file(FILENAME)"
@@ -30,10 +32,9 @@ To test, copy a valid .xyz file into the watched directory (sample .xyz files ca
 
 The xyz\_to\_feff program requires a couple of python packages, both of which can be installed via pip. 
 pip install periodic
-pip install watchdog
+pip install matplotlib
 
-pip itself may be installed on Unix systems via:
-pip install -U pip
+Instructions to install pip itself may be found [here](http://pip.readthedocs.org/en/latest/installing.html).
 
 ifeffit and perl are also assumed to be installed, both of which can be installed through your package manager.  
 
