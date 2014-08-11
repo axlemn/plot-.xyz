@@ -14,7 +14,7 @@ from helper import *
 
 METADATA_FILE = "temp.txt"
 
-def update_file(f):
+def update_file(f, *args):
     '''The main function.  This directs what is to be done to input 
     file f on update.  Should work on relative paths, but if that's not working,
     passing the absolute path won't hurt.'''
@@ -38,42 +38,44 @@ def update_file(f):
         subprocess.call(['perl', 'ifeffit_script.ps', \
             get_dirname(f, run_index)])
 
-    ##############
-    # Main loop:
-    ##############
-    # Tracks how many times feff has been run:
-    run_index = 0
-    # num_center_atoms is set within the loop, initializing 
-    # arbitrarily so preconditions are met
-    num_center_atoms = 1
-    while run_index < num_center_atoms:
+    if '-n' not in args:
+        ##############
+        # Main loop:
+        ##############
+        # Tracks how many times feff has been run:
+        run_index = 0
+        # num_center_atoms is set within the loop, initializing 
+        # arbitrarily so preconditions are met
+        num_center_atoms = 1
+        while run_index < num_center_atoms:
+    
+            # Making subdirectory to hold files for a fixed run index
+            new_dir = get_dirname(f, run_index)
+            make_sure_path_exists(new_dir)
+    
+            # xyz_to_feff.py called
+            # Note1: .xyz file is assumed to use atomic symbols, and angstroms 
+            # as coordinates 
+            # Note2: when run_index == 0, xyz_to_feff records num_center_atoms 
+            # in temp.txt file.  
+            # Note3: xyz_to_feff is called every time.  It may seem redundant, 
+            # but this allows slightly easier and more sensibly modular
+            # pruning of the data to be done within xyz_to_feff.py
+            convert_xyz(f, run_index)
+    
+            # feff called
+            run_feff(f, run_index)
+    
+            # If not done already, gets num_center_atoms via the temp.txt file
+            if run_index == 0:
+                num_center_atoms = read_num_center_atoms(f)
+    
+            calc_chik(f, run_index)
+            run_index += 1
+        ##################
+    else: 
+        num_center_atoms = read_num_center_atoms(f)
 
-        # Making subdirectory to hold files for a fixed run index
-        new_dir = get_dirname(f, run_index)
-        make_sure_path_exists(new_dir)
-
-        # xyz_to_feff.py called
-        # Note1: .xyz file is assumed to use atomic symbols, and angstroms 
-        # as coordinates 
-        # Note2: when run_index == 0, xyz_to_feff records num_center_atoms 
-        # in temp.txt file.  
-        # Note3: xyz_to_feff is called every time.  It may seem redundant, 
-        # but this allows slightly easier and more sensibly modular
-        # pruning of the data to be done within xyz_to_feff.py
-        convert_xyz(f, run_index)
-
-        # feff called
-        run_feff(f, run_index)
-
-        # If not done already, gets num_center_atoms via the temp.txt file
-        if run_index == 0:
-            num_center_atoms = read_num_center_atoms(f)
-
-        calc_chik(f, run_index)
-        run_index += 1
-    ##############
-
-    ## Add comment remind what -the perl script does with this directory.
     unaveraged_chik = get_dirname(f, "paths")
     make_sure_path_exists(unaveraged_chik)
 
