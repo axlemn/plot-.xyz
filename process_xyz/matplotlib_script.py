@@ -43,6 +43,11 @@ def avg(f_list, dirname):
     f.write("#----------------\n")
     f.write("#   k         chi\n")
     for (x,y) in sorted_keys:
+        # There is a very rare bug here.
+        # The bug would exist for floats in scientific notation, i.e. matching
+        # .*e{\d}*, after being converted to a string.  Then part or all of the 
+        # exponent would be truncated.  This occurs because floats show
+        # at most 12 digits of precision when converted to a string
         split_key = str(x).split('.')
         f.write("  ")
         l0 = len(split_key[0])

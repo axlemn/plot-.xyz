@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use Ifeffit;
+$dir_name = $ARGV[0];
+$basein = $ARGV[1];
+$baseout = $ARGV[2];
+$fftf_string = "fftf(A.chi, k=A.k, kmin=3.0, kmax=14.0, dk=1.0, kweight=3, kwindow=Hanning)";
+#if (defined $ARGV[3]) {
+#    if ((substr $ARGV[3], 0, 5) eq 'fftf\(') {
+#        $fftf_string = $ARGV[3]
+#    }
+#}
+$file_in = $dir_name . '/' . $basein;
+print $file_in;
+$file_out = $dir_name . "/" . $baseout;
+ifeffit("read_data(file=" . $file_in . ", group=A, type=label)");
+#fftf
+print $fftf_string;
+ifeffit($fftf_string);
+ifeffit("write_data(file=" . $file_out . ", A.r, A.chir_re)");

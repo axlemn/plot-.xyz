@@ -12,6 +12,7 @@ import glob
 import sys
 from time import sleep
 from run_script import update_file
+from helper import *
 
 def store_stamps(new_stamps, ts_file):
     'Given a set of stamps, stores it in the timestamp file.'

@@ -6,6 +6,7 @@ Made to work in \*nix.
 
 Summary of each file (in order of usage):
 ------------------
+- helper.py holds several basic helper functions/constants
 - timestamps.py initializes and watches a file storing a list of file names and their last modified times. 
 - run\_script.py manages the data piping.  update\_file is the main function.  
 - xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (zero-indexed).  
@@ -14,7 +15,7 @@ Summary of each file (in order of usage):
 - chir.ps converts chi.k files to chi.r files.  
 
 To ignore automatic detection and manually run the data processing on a specific file, navigate to the process\_xyz folder and run:
-python -c "from run\_script import update\_file; update\_file(FILENAME)"
+python ./test\_updater.py /filepath/to/update
 
 Obtaining and Using
 ===========
@@ -46,7 +47,7 @@ TODO:
 
 Known issues
 ----
-- None at the moment!
+- Note that if you encounter "Fatal Error: No absorbing atom (ipot=0) defined", it almost always means that the first attempt at xyz conversion failed.  At this point, try running the test\_xyz\_converter.py script.
 
 Changelog 
 ----

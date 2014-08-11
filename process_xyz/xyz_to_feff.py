@@ -2,27 +2,31 @@
 # Alexander Mun
 # 07/02/2014
 
-from run_script import get_dirname
 import periodic as pt
 import sys
 import re
 import os.path
+from helper import *
 
 central_elt = "Ta"
+# How far can atoms be before being disqualified?
+THRESHOLD=5
+EPSILON = .0000001
 
 def scrape_xyz(f_name):
 #   Gets data from a file of format .xyz
     atom_lines = []
     f = open(f_name, 'r+')
     for (i,line) in enumerate(f):
-#   if it's at least the 3rd line:
+#   if it's at least the 3rd line, and not blank:
+        if line == "\n":
+            continue
         if i > 1:
             atom_lines.append(line)
 
     atoms = []
     for l in atom_lines:
         atoms.append(l.split())
-
     if atoms == []:
         raise Exception(f_name + " has no data!")
 
@@ -72,15 +76,18 @@ def shift_atoms(atoms, n):
     center = atoms.pop(center_index)
     atoms.insert(0, list(center))
 
-    #   Will cause rounding issue if .xyz changes the standard to be more 
-    #   than 5 decimal places.  
     for (i,a) in enumerate(atoms): 
         a[1] = float(a[1]) - float(center[1])
         a[2] = float(a[2]) - float(center[2])
         a[3] = float(a[3]) - float(center[3])
-        for i in range(1,4):
-            a[i] = format(a[i], '.5f') 
 
+def prune_atom(atom):
+    '''Given an 'atom' (a split line of data), returns whether or not 
+    we want to ignore that atom during printing.  Shifting has occured before
+    any atoms are pruned.'''
+    if ((atom[1]**2 + atom[2]**2 + atom[3]**2) > (THRESHOLD**2 + EPSILON)):
+        return True
+    return False
 
 def output(f_name, n):
     """ 
@@ -92,6 +99,7 @@ def output(f_name, n):
     atom_list = scrape_xyz(f_name)
 
     if n == 0:
+        make_sure_path_exists(get_dirname(f_name))
         temp = open(get_dirname(f_name) + 'temp.txt', 'w')
         temp.write('num_center_atoms = ' + str(num_central(atom_list)))
 
@@ -131,11 +139,17 @@ def output(f_name, n):
     sys.stdout.write('\n')
 
     print "ATOMS\n" \
-          "* x        y        z       ipot"
+          "* x         y         z       ipot"
     for (i, atom) in enumerate(atom_list):
+        if prune_atom(atom):
+            continue
         for j in range(1,4):
+            # Six decimal places appears to be a standard, but 
+            # may lose a very small amount of information.  
+            atom[j] = format(atom[j], '.6f')
             sys.stdout.write(' '*(9-len(atom[j])))
             sys.stdout.write(atom[j])
+            sys.stdout.write(' ')
         sys.stdout.write(' '*3)
         if i == 0:
             print '0'
