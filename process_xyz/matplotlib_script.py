@@ -121,6 +121,7 @@ def main(f_list):
 
 if __name__ == '__main__':
     dirname = os.path.abspath(sys.argv[1])
+    sqFlag = False
     if '-s' == sys.argv[-1]: 
         sFlag = True
         f_list = sys.argv[2:-1];
@@ -140,15 +141,15 @@ if __name__ == '__main__':
         chikcubed.append((k[0], (float(k[0])**3 * float(k[1]))))
     f = open(dirname + '/' + default_chik_cubed, 'w')
     write_data(f, chikcubed)
-
-    chiksq = []
-    for k in chik:
-        chiksq.append((k[0], (float(k[0])**2 * float(k[1]))))
-    f = open(dirname + '/' + default_chik_sq, 'w')
-    write_data(f, chiksq)
-
-    make_window(dirname + '/' + default_chik_sq)
     make_window(dirname + '/' + default_chik_cubed)
+
+    if sqFlag:
+        chiksq = []
+        for k in chik:
+            chiksq.append((k[0], (float(k[0])**2 * float(k[1]))))
+        f = open(dirname + '/' + default_chik_sq, 'w')
+        write_data(f, chiksq)
+        make_window(dirname + '/' + default_chik_sq)
 
     if sFlag:
         main(f_list)
