@@ -73,7 +73,7 @@ def main(dirname, ts_file):
                     print f
                 store_stamps(new_stamps, ts_file)
         except (KeyboardInterrupt, SystemExit):
-            print "\n\nProgram ended by user input."
+            print "\n\nProgram ended by user."
             exit(0)
 
 if __name__ == '__main__':    

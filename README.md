@@ -8,8 +8,8 @@ Summary of each file (in order of usage):
 ------------------
 - helper.py holds several basic helper functions/constants
 - timestamps.py initializes and watches a file storing a list of file names and their last modified times. 
-- run\_script.py manages the data piping.  update\_file is the main function.  
-- xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (zero-indexed).  
+- run\_script.py manages most file creation, reading, and spawning of subprocesses.  update\_file is the main function.  
+- xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (zero-indexed).  Some atoms are ignored for being irrelevant (usually because they are outside a set threshold distance).
 - ifeffit\_script.ps takes feff####.dat files in a directory and writes a file containing chi(k) file.  
 - matplotlib\_script.py averages chi(k) files, and controls what matplotlib will eventually plot.
 - chir.ps converts chi.k files to chi.r files.  

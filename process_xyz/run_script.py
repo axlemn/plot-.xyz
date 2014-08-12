@@ -2,7 +2,7 @@
 # 06/17/14
 
 # Calls some terminal command on all files which need to be 
-# updated, as specified
+# updated
 
 import subprocess
 import shutil
@@ -79,7 +79,7 @@ def update_file(f, *args):
     unaveraged_chik = get_dirname(f, "paths")
     make_sure_path_exists(unaveraged_chik)
 
-    ## Gathering and averaging chi(k) ##
+    ## Gathering chi(k) to push to matplotlib_script.py ##
     f_list = []
     for i in range(0, num_center_atoms):
         f_list.append( get_dirname(f, i) + "/ifeffit_out" )
@@ -87,8 +87,10 @@ def update_file(f, *args):
     ### Graphing and plotting in matplotlib: ###
     # Opens subprocess via Popen to prevent matplotlib graphs from blocking 
     # loops in superprocesses.  Graphs are created and plotted:
+    if '-s' in args: sFlag = ['-s']; 
+    else: sFlag =[];
     subprocess.Popen(['python', 'matplotlib_script.py',
-         get_dirname(f)] + f_list)
+         get_dirname(f)] + f_list + sFlag)
 
     ### Cleanup ###
     clean(f, num_center_atoms)
