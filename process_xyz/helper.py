@@ -1,6 +1,10 @@
 import os
 import errno
 
+# Sets default names for files  
+default_chik = "chi.k"
+default_chir = "chi.r"
+
 '''Contains many helper functions.  Ideally will not import libraries that are tempermental if imported multiple times.'''
 
 def make_sure_path_exists(path):

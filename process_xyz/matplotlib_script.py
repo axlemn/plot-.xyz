@@ -4,15 +4,7 @@ import subprocess
 import os
 from helper import *
 
-default_chik = "chi.k"
-default_chik_sq = "chiksq.k"
-default_chik_cubed = "chikcubed.k"
-default_chir = "chi.r"
-
-def display_avg(dirname):
-    make_window(dirname + '/' + default_chik)
-
-def avg(f_list, dirname):
+def avg_chik(f_list, dirname):
     count = len(f_list)
     d = {}
     d_init_flag = True
@@ -56,7 +48,8 @@ def read_data(f_name):
     return data
 
 def write_data(f, sorted_keys):
-    '''Writes sorted_keys for matplotlib to read to file object f.'''
+    '''Writes sorted_keys for matplotlib to read to file object f, then 
+    closes f.'''
     f.write("#----------------\n")
     f.write("#   k         chi\n")
     for (x,y) in sorted_keys:
@@ -105,13 +98,32 @@ def make_window(f_name, **window_info):
     plt.plot(x, y)
     f.close()
 
-def find_chir(dirname, chik=default_chik, chir=default_chir):
-    '''Makes a Re[chi(r)] plot given a directory and the filename of a 
-    chi(k) plot.'''
-    print ['perl', 'chir.ps', dirname, chik, chir]
-    subprocess.call(['perl', 'chir.ps', dirname, chik, chir])
+def plot_chik(exp_k):
+    '''Makes window with chi(k).'''
 
-def main(f_list):
+    avg_chik = dirname + '/' + default_chik
+    if exp_k == 0:
+        make_window(avg_chik)
+        return
+
+    chik = read_data(avg_chik)
+    chik_exp = []
+    for k in chik:
+        chik_exp.append((k[0], (float(k[0])**exp_k * float(k[1]))))
+
+    f = open(dirname + '/' + default_chik + '_kexp_' + str(exp_k), 'w')
+    f_name = f.name
+    write_data(f, chik_exp)
+
+    make_window(f_name)
+
+def show_windows():
+    try:
+        plt.show()
+    except KeyboardInterrupt:
+        print "Plots closed by KeyboardInterrupt."
+
+def plot_files(f_list):
     count = 0
     for f_name in f_list:
         count += 1 
@@ -119,46 +131,47 @@ def main(f_list):
         if count > 50:
             break
 
+def find_chir(dirname, chik=default_chik, chir=default_chir):
+    '''Makes a Re[chi(r)] plot given a directory and the filename of a 
+    chi(k) plot.'''
+    to_call = ['perl', 
+                os.path.dirname(os.path.realpath(__file__)) + '/chir.ps', 
+                dirname, 
+                chik, 
+                chir]
+    print '\nCalculating chi(r):'
+    print ' '.join(to_call)
+    subprocess.call(to_call)
+
+def main(f_list, aFlag=False, rFlag=False, kFlag=False):
+    if aFlag == True:
+        # Calculates average of f_list files, i.e. averaged chi(k)
+        avg_chik(f_list, dirname)
+    if kFlag == True:
+        # Show chik with kexp 3:
+        plot_chik(3)
+    if rFlag == True:
+        # Finds chi(r) via perl script whch invokes ifeffit
+        # And plots it
+        find_chir(dirname)
+        make_window(dirname + '/' + default_chir)
+
+    show_windows()
+
 if __name__ == '__main__':
     dirname = os.path.abspath(sys.argv[1])
-    sqFlag = False
-    if '-s' == sys.argv[-1]: 
-        sFlag = True
-        f_list = sys.argv[2:-1];
-    else: 
-        sFlag = False
-        f_list = sys.argv[2:]
+    nfiles = int(sys.argv[2])
+    f_list = sys.argv[3:3+nfiles]
+    flags = sys.argv[3+nfiles:]
 
-    # Calculates average of f_list files, i.e. averaged chi(k)
-    avg(f_list, dirname)
-    # Shows it
-    display_avg(dirname)
+    aFlag = False
+    rFlag = False
+    kFlag = False
+    if '-a' in flags:
+        aFlag = True
+    if '-r' in flags:
+        rFlag = True
+    if '-k' in flags:
+        kFlag = True
 
-    avg_chik = dirname + '/' + default_chik
-    chik = read_data(avg_chik)
-    chikcubed = []
-    for k in chik:
-        chikcubed.append((k[0], (float(k[0])**3 * float(k[1]))))
-    f = open(dirname + '/' + default_chik_cubed, 'w')
-    write_data(f, chikcubed)
-    make_window(dirname + '/' + default_chik_cubed)
-
-    if sqFlag:
-        chiksq = []
-        for k in chik:
-            chiksq.append((k[0], (float(k[0])**2 * float(k[1]))))
-        f = open(dirname + '/' + default_chik_sq, 'w')
-        write_data(f, chiksq)
-        make_window(dirname + '/' + default_chik_sq)
-
-    if sFlag:
-        main(f_list)
-
-    # Finds chi(r) via perl script whch invokes ifeffit
-    find_chir(dirname)
-    # And plots it
-    make_window(dirname + '/' + default_chir)
-    try:
-        plt.show()
-    except KeyboardInterrupt:
-        print "Plots closed by KeyboardInterrupt."
+    main(f_list, aFlag, rFlag, kFlag)

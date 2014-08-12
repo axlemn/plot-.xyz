@@ -47,6 +47,9 @@ def update_file(f, *args):
         # num_center_atoms is set within the loop, initializing 
         # arbitrarily so preconditions are met
         num_center_atoms = 1
+
+        # To pay for speed in computing power, one could thread the following 
+        # loop instead of doing each iteration consecutively
         while run_index < num_center_atoms:
     
             # Making subdirectory to hold files for a fixed run index
@@ -85,12 +88,17 @@ def update_file(f, *args):
         f_list.append( get_dirname(f, i) + "/ifeffit_out" )
 
     ### Graphing and plotting in matplotlib: ###
+
+    # Averaging must occur before graphs can open
+    subprocess.call(['python', 'matplotlib_script.py',
+         get_dirname(f), str(len(f_list))] + f_list + ['-a'])
+
+    # Plotting averaged chi(k) and chi(r)
     # Opens subprocess via Popen to prevent matplotlib graphs from blocking 
-    # loops in superprocesses.  Graphs are created and plotted:
-    if '-s' in args: sFlag = ['-s']; 
-    else: sFlag =[];
+    # loops in super-processes.  
     subprocess.Popen(['python', 'matplotlib_script.py',
-         get_dirname(f)] + f_list + sFlag)
+         get_dirname(f), str(0), '-k', '-r'])
+    ############################################
 
     ### Cleanup ###
     clean(f, num_center_atoms)

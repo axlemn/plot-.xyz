@@ -159,7 +159,7 @@ def output(f_name, n):
     sys.stdout.write('\n')
 
     print('END')
-            
+
 if __name__ == '__main__':
     args = sys.argv
     if len(args) != 3:
