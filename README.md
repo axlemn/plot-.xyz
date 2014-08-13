@@ -5,17 +5,17 @@ When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplot
 Made to work in \*nix.
 
 Summary of each file (in order of usage):
-------------------
+==================
+- watch\_for\_xyz takes in a directory to watch (by default the current directory), and contains the loop which tracks which files to update.  
+- update\_xyz takes in a single file to update.
+Files used to process\_xyz:
+---------------
+- run\_script.py manages most spawning of subprocesses.  update\_file is the main function, and determines what will happen to a files given by watch\_for\_xyz.
 - helper.py holds several basic helper functions/constants
-- timestamps.py initializes and watches a file storing a list of file names and their last modified times. 
-- run\_script.py manages most file creation, reading, and spawning of subprocesses.  update\_file is the main function.  
-- xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (zero-indexed).  Some atoms are ignored for being irrelevant (usually because they are outside a set threshold distance).
-- ifeffit\_script.ps takes feff####.dat files in a directory and writes a file containing chi(k) file.  
+- xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (n is zero-indexed).  Atoms are filtered here (currently: removed if outside of threshold distance).
+- ifeffit\_script.ps takes a directory name, and uses all feff####.dat produced by feff in the directory to write a file containing chi(k) data.  
 - matplotlib\_script.py averages chi(k) files, and controls what matplotlib will eventually plot.
-- chir.ps converts chi.k files to chi.r files.  
-
-To ignore automatic detection and manually run the data processing on a specific file, navigate to the process\_xyz folder and run:
-python ./test\_updater.py /filepath/to/update
+- chir.ps converts chi.k files to chi.r files.  Called by the matplotlib\_script.
 
 Obtaining and Using
 ===========
@@ -23,13 +23,16 @@ Download the .tar.gz file under dist via the "View Raw" option from GitHub.
 
 Unpack the file:
 tar -zxvf xyztofeff-0.1dev.tar.gz
+Navigate to the new directory:
+cd xyztofeff-0.1dev
+Install via:
+python setup.py install
+(Most users will want to use sudo for the install step.)
 
-To start monitoring a directory, cd to 
-/xyztofeff-0.1dev/process\_xyz
-
-and run: python timestamps.py [path/to/watch]
-
-To test, copy a valid .xyz file into the watched directory (sample .xyz files can be found in the testfiles folder).
+To uninstall, run:
+pip uninstall xyztofeff
+Again, sudo may be necessary. 
+Note that the commands may still appear to exist, since pip may not remove files in your /usr/local/bin directory.
 
 The xyz\_to\_feff program requires a couple of python packages, both of which can be installed via pip. 
 pip install periodic
@@ -41,9 +44,10 @@ ifeffit and perl are also assumed to be installed, both of which can be installe
 
 TODO:
 ----
-- Modify setup.py file to check package installation, and add easy access to program via /usr/bin/
+- Modify setup.py file to check for a functioning ifeffit perl wrapper
 - Clean output to terminal per feff / ifeffit run
 - Create logfile per run
+- http://cars9.uchicago.edu/autobk/refman/node80.html
 
 Known issues
 ----
