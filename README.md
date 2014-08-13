@@ -8,6 +8,7 @@ Summary of each file (in order of usage):
 ==================
 - watch\_for\_xyz takes in a directory to watch (by default the current directory), and contains the loop which tracks which files to update.  
 - update\_xyz takes in a single file to update.
+
 Files used to process\_xyz:
 ---------------
 - run\_script.py manages most spawning of subprocesses.  update\_file is the main function, and determines what will happen to a files given by watch\_for\_xyz.
