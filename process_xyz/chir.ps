@@ -11,7 +11,7 @@ $fftf_string = "fftf(A.chi, k=A.k, kmin=3.0, kmax=14.0, dk=1.0, kweight=3, kwind
 #    }
 #}
 $file_in = $dir_name . '/' . $basein;
-print "Invoking in Ifeffit:\n";
+print "Taking Fourier transform in Ifeffit:\n";
 $file_out = $dir_name . "/" . $baseout;
 ifeffit("read_data(file=" . $file_in . ", group=A, type=label)");
 #fftf

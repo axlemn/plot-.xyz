@@ -11,8 +11,8 @@ import os
 import glob
 import sys
 from time import sleep
-from run_script import update_file
-from helper import *
+from process_xyz.run_script import update_file
+from process_xyz.helper import *
 
 def store_stamps(new_stamps, ts_file):
     'Given a set of stamps, stores it in the timestamp file.'
@@ -78,11 +78,13 @@ def main(dirname, ts_file):
 
 if __name__ == '__main__':    
     args = sys.argv
-    if len(args) not in [2,3]:
-        print 'Usage: init_timestamps.py /dir/to/watch '\
+    if len(args) > 3:
+        print 'Usage: timestamps.py [/dir/to/watch] '\
             '[timestamp_file]'
         sys.exit(1)
-    if len(args) == 2:
+    if len(args) == 1:
+        args.append(os.getcwd())
+    if len(args) in [1, 2]:
         args.append(os.path.abspath(args[1]) + '/timestamps.txt')
     print "Initial files found:"
     for f in write_stamps(*args[1:]):

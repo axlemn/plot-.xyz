@@ -13,6 +13,7 @@ import threading
 from helper import *
 
 METADATA_FILE = "temp.txt"
+this_file_dir = os.path.dirname(os.path.realpath(__file__))
 
 def update_file(f, *args):
     '''The main function.  This directs what is to be done to input 
@@ -35,7 +36,7 @@ def update_file(f, *args):
         '''Runs ifeffit_script.ps on dir with data from feff that has 
            the run_index atom in the center.  Zero indexed.'''
         print ['perl', 'ifeffit_script.ps', get_dirname(f, run_index)]
-        subprocess.call(['perl', 'ifeffit_script.ps', \
+        subprocess.call(['perl', this_file_dir + '/' + 'ifeffit_script.ps', \
             get_dirname(f, run_index)])
 
     if '-n' not in args:
@@ -90,14 +91,21 @@ def update_file(f, *args):
     ### Graphing and plotting in matplotlib: ###
 
     # Averaging must occur before graphs can open
-    subprocess.call(['python', 'matplotlib_script.py',
+    subprocess.call(['python', this_file_dir + '/' + 'matplotlib_script.py',
          get_dirname(f), str(len(f_list))] + f_list + ['-a'])
 
     # Plotting averaged chi(k) and chi(r)
     # Opens subprocess via Popen to prevent matplotlib graphs from blocking 
     # loops in super-processes.  
-    subprocess.Popen(['python', 'matplotlib_script.py',
-         get_dirname(f), str(0), '-k', '-r'])
+    p = subprocess.Popen(['python', 
+                        this_file_dir + '/' + 'matplotlib_script.py',
+                        get_dirname(f), str(0), 
+                        '-k', '-r'])
+
+    # Should only wait for the LAST updated file, if update_file is called 
+    # on some short list (note there's some danger in parallelizing update_file
+    # since feff is called on the current directory, which can cause issues)
+    p.wait()
     ############################################
 
     ### Cleanup ###
@@ -120,11 +128,15 @@ def convert_xyz(f, run_index):
     # Piping output of xyz_to_feff into subdirectory with the name 'feff.inp'
     f_name = new_dir + '/feff.inp'
     output_f = open(f_name, 'w')
+    # 'Hi user, this is what I'm doing!'
     print "Converting xyz file...\n Writing output of "
-    print "  python xyz_to_feff.py " + f + ' ' + str(run_index) 
+    to_call = ['python', 
+                this_file_dir + '/' + 'xyz_to_feff.py', 
+                f, 
+                str(run_index)]
+    print ' '.join(to_call)
     print " to file " + f_name
-    subprocess.call(['python', 'xyz_to_feff.py', f, str(run_index)],\
-        stdout=output_f, stderr=subprocess.PIPE)
+    subprocess.call(to_call, stdout=output_f, stderr=subprocess.PIPE)
     output_f.close()
 
 def run_feff(f, run_index):

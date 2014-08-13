@@ -10,5 +10,6 @@ setup(
     version='0.1dev',
     packages=find_packages(),
     include_package_data=True,
+    scripts=['watch_for_xyz', 'update_xyz'],
     install_requires=['periodic']
 )
