@@ -16,9 +16,13 @@ from process_xyz.helper import *
 
 def store_stamps(new_stamps, ts_file):
     'Given a set of stamps, stores it in the timestamp file.'
-    f = open(ts_file, 'w+')
-    pickle.dump(new_stamps, f)
-    f.close()
+    try:
+        f = open(ts_file, 'w+')
+        pickle.dump(new_stamps, f)
+        f.close()
+    except IOError:
+        print "\n***** Did you mean to use update_file instead of watch_for_xyz?*****"
+        raise
 
 def read_stamps(ts_file):
     'Retrieves data from the timestamp file.'
@@ -89,4 +93,5 @@ if __name__ == '__main__':
     print "Initial files found:"
     for f in write_stamps(*args[1:]):
         print f
+    print "...\nAwaiting changes..."
     main(*args[1:])

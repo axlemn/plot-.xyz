@@ -91,12 +91,13 @@ def update_file(f, *args):
     ### Graphing and plotting in matplotlib: ###
 
     # Averaging must occur before graphs can open
-    subprocess.call(['python', this_file_dir + '/' + 'matplotlib_script.py',
+    subprocess.call(['python', 
+         this_file_dir + '/' + 'matplotlib_script.py',
          get_dirname(f), str(len(f_list))] + f_list + ['-a'])
 
     # Plotting averaged chi(k) and chi(r)
-    # Opens subprocess via Popen to prevent matplotlib graphs from blocking 
-    # loops in super-processes.  
+    # Opens subprocess via Popen to prevent matplotlib graphs from 
+    # blocking loops in super-processes.  
     p = subprocess.Popen(['python', 
                         this_file_dir + '/' + 'matplotlib_script.py',
                         get_dirname(f), str(0), 

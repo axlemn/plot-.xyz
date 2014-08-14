@@ -1,8 +1,6 @@
 Description
 ===========
 
-NOTE: THIS IS NOT A WORKING COMMIT
-
 When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplotlib are used to plot the chi(k) formed by averaging over all possible choices for a central atom of a specific element (by default, Tantalum).  
 
 Made to work in \*nix.
@@ -26,13 +24,13 @@ Usage
 
 After installation, run either 
 
-    $ update_xyz FILENAME
+    $ update_xyz FILENAME [-n]
 
 or 
 
     $ watch_for_xyz [/dir/to/watch]
 
-By default this watches your working directory.  
+By default watch\_for\_xyz watches your working directory.  Adding the -n flag to the end of update\_xyz will not run feff or ifeffit, only matplotlib.
 
 How to Obtain
 ===========
