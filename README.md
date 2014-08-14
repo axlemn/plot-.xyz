@@ -1,5 +1,8 @@
 Description
 ===========
+
+NOTE: THIS IS NOT A WORKING COMMIT
+
 When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplotlib are used to plot the chi(k) formed by averaging over all possible choices for a central atom of a specific element (by default, Tantalum).  
 
 Made to work in \*nix.
@@ -37,26 +40,31 @@ Download the .tar.gz file under dist via the "View Raw" option from GitHub.
 
 Unpack the file:
 
-    $tar -zxvf xyztofeff-0.1dev.tar.gz
+    $ tar -zxvf xyztofeff-0.1dev.tar.gz
 
 Navigate to the new directory:
 
-    $cd xyztofeff-0.1dev
+    $ cd xyztofeff-0.1dev
 
 Install via:
 
-    $python setup.py install 
+    $ python setup.py install 
 
 Most users will want to use sudo for the install step.
-The "--record files.txt" is not necessary, but will make uninstallation slightly simpler.  
 
 How to Uninstall
 -------------
 Navigate to the xyztofeff-0.1dev directory and run:
 
-    $python setup.py install --record files.txt
+    $ python setup.py install --record files.txt
 
-Again, sudo may be necessary. 
+Again, sudo may be necessary.  This write the locations all files which were created during installation to the folder "files.txt".  
+
+To remove most of them, run 
+
+    $ pip uninstall xyztofeff
+
+with sudo if you installed the program with sudo.
 
 Note that the commands may still appear to exist, since pip may not remove files in your /usr/local/bin directory.  This is fine if you intend to reinstall the program.  Otherwise, navigate to your /usr/local/bin and delete any files listed in files.txt.
 
@@ -64,9 +72,9 @@ Requirements
 ------------
 The xyz\_to\_feff program requires a couple of python packages, both of which can be installed via pip. 
 
-    $pip install periodic
+    $ pip install periodic
 
-    $pip install matplotlib
+    $ pip install matplotlib
 
 Instructions to install pip itself may be found [here](http://pip.readthedocs.org/en/latest/installing.html).
 
@@ -77,13 +85,12 @@ Perhaps most tricky to install is the perl wrapper for ifeffit.  This can also b
 TODO:
 ----
 - Modify setup.py file to check for a functioning ifeffit perl wrapper
-- Clean output to terminal per feff / ifeffit run
-- Create logfile per run
 - http://cars9.uchicago.edu/autobk/refman/node80.html
 
 Known issues
 ----
 - The message "Fatal Error: No absorbing atom (ipot=0) defined" probably means that the attempt at xyz conversion failed.  At this point, try running the test\_xyz\_converter.py script.
+- Files with incredibly long names cause errors.  This is probably for the best (since some filesystems cannot handle very long names in files)
 
 Changelog 
 ----
