@@ -39,7 +39,7 @@ By default watch\_for\_xyz watches your working directory.
         is already up-to-date and skips straight to calculating the average
         chi(k) and graphing
 
-How to Obtain
+How to Obtain / Update
 ===========
 Download the .tar.gz file under dist via the "View Raw" option from GitHub.
 
@@ -56,6 +56,8 @@ Install via:
     $ python setup.py install 
 
 Most users will want to use sudo for the install step.
+
+If you make your own changes, the install can also be used to overwrite old installed files with the newer ones.  
 
 How to Uninstall
 -------------
