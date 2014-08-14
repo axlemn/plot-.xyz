@@ -8,29 +8,8 @@ import re
 import os.path
 from helper import *
 
-central_elt = "Ta"
-# How far can atoms be before being disqualified?
-THRESHOLD=5
-EPSILON = .0000001
-
-def scrape_xyz(f_name):
-#   Gets data from a file of format .xyz
-    atom_lines = []
-    f = open(f_name, 'r+')
-    for (i,line) in enumerate(f):
-#   if it's at least the 3rd line, and not blank:
-        if line == "\n":
-            continue
-        if i > 1:
-            atom_lines.append(line)
-
-    atoms = []
-    for l in atom_lines:
-        atoms.append(l.split())
-    if atoms == []:
-        raise Exception(f_name + " has no data!")
-
-    return atoms
+# How far can atoms be from the central atom before being disqualified?
+ATOM_DIST_THRESHOLD=5
 
 def elements(atoms):
 #   Lists the elements in a list of atoms.
@@ -49,14 +28,14 @@ def dictionary_from_elts(elts):
         d.update({e:i})
     return d
 
-def num_central(atoms):
+def central_indices(atoms, elt=central_elt):
     central_indices = []
     for (i,a) in enumerate(atoms):
-        if a[0] == central_elt:
+        if a[0] == elt:
             central_indices.append(i)
-    return len(central_indices)
+    return central_indices
 
-def shift_atoms(atoms, n):
+def shift_atoms(atoms, n, shift=True):
     '''Finds nth atom of type central_elt (the first is the zeroth), moves it to
     the front of the list, and shifts all atoms such that it 
     is at the center.'''
@@ -73,19 +52,24 @@ def shift_atoms(atoms, n):
     if center_index == -1:
         raise Exception("No " + central_elt + " atom found to shift to center.")
 
-    center = atoms.pop(center_index)
-    atoms.insert(0, list(center))
+    if shift == True:
+        center = atoms.pop(center_index)
+        atoms.insert(0, list(center))
 
-    for (i,a) in enumerate(atoms): 
-        a[1] = float(a[1]) - float(center[1])
-        a[2] = float(a[2]) - float(center[2])
-        a[3] = float(a[3]) - float(center[3])
+        for (i,a) in enumerate(atoms): 
+            a[1] = float(a[1]) - float(center[1])
+            a[2] = float(a[2]) - float(center[2])
+            a[3] = float(a[3]) - float(center[3])
+    else:
+        center = atoms[center_index]
+        return center[:]
 
 def prune_atom(atom):
     '''Given an 'atom' (a split line of data), returns whether or not 
-    we want to ignore that atom during printing.  Shifting has occured before
-    any atoms are pruned.'''
-    if ((atom[1]**2 + atom[2]**2 + atom[3]**2) > (THRESHOLD**2 + EPSILON)):
+    we want to ignore that atom during printing (and thus in feff, ifeffit, 
+    etc).  Shifting will have finished before any atoms are pruned.'''
+    if ((atom[1]**2 + atom[2]**2 + atom[3]**2) > \
+                    (ATOM_DIST_THRESHOLD**2 + EPSILON)):
         return True
     return False
 
@@ -97,14 +81,15 @@ def output(f_name, n):
     """
 
     atom_list = scrape_xyz(f_name)
+    num_central = len(central_indices(atom_list))
 
     if n == 0:
         make_sure_path_exists(get_dirname(f_name))
         temp = open(get_dirname(f_name) + 'temp.txt', 'w')
-        temp.write('num_center_atoms = ' + str(num_central(atom_list)))
+        temp.write('num_center_atoms = ' + str(num_central))
 
     # n is an index
-    if n >= num_central(atom_list):
+    if n >= num_central:
         return
     # Shifts first Ta atom to center and to the front
     shift_atoms(atom_list, n)

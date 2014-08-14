@@ -10,27 +10,61 @@ import os
 import time
 import matplotlib_script as mpl
 import threading
+import re
 from helper import *
+import xyz_to_feff
 
+FROM_CENTER = 5.0
 METADATA_FILE = "temp.txt"
 this_file_dir = os.path.dirname(os.path.realpath(__file__))
 
 def update_file(f, *args):
     '''The main function.  This directs what is to be done to input 
     file f on update.  Should work on relative paths, but if that's not working,
-    passing the absolute path won't hurt.'''
+    passing the absolute path won't hurt.
 
-    def read_num_center_atoms(f):
-        '''Looks in f's directory for a temp.txt file, and from it reads
-        and returns the number of center atoms.'''
+    Flags:
+    -m will skip displaying output graphs.
+    -e will use only paths from atoms nearby the center_of_mass 
+    -n will avoid re-calculating paths in feff, i.e. assumes that the file 
+        is already up-to-date and skips straight to calculating the average
+        chi(k) and graphing
+    '''
+
+    def read_metadata(f, s):
+        '''Looks in f's directory for a METADATA_FILE, and from it reads
+        and returns the data corresponding to the string s.'''
         file_path = get_dirname(f, METADATA_FILE)
         temp = open(file_path, 'r')
         for l in temp:
             # Checks if the part of a string appearing 
-            # before an = on a line is 'num_center_atoms'
-            if l.split('=')[0].split()[0] == 'num_center_atoms':
-                 num = int(l.split('=')[1].split()[0])
-        return num
+            # before an = on a line is s, returns rest of line 
+            if l!="" and l.split('=') != [] and l.split('=')[0].split()[0] == s:
+                 return '='.join(l.split('=')[1:])
+
+    def write_metadata(f, s, data):
+        '''Looks in f's directory for a METADATA_FILE, and from it reads
+        and returns the data corresponding to the string s.'''
+        file_path = get_dirname(f, METADATA_FILE)
+        temp = open(file_path, 'r')
+        search = None
+        r = temp.readlines()
+        temp.close()
+
+        for (i,l) in enumerate(r):
+            # Checks if the part of a string appearing 
+            # before an = on a line is s, returns rest of line 
+            if l!="" and l.split('=') != [] and l.split('=')[0].split()[0] == s:
+                 search = i
+
+        if search != None:
+            r.pop(search)
+
+        temp = open(file_path, 'w')
+        for l in r:
+            temp.write(l + '\n')
+        temp.write(s + "=" + data)
+        temp.close()
 
     def calc_chik(f, run_index):
         '''Runs ifeffit_script.ps on dir with data from feff that has 
@@ -43,16 +77,40 @@ def update_file(f, *args):
         ##############
         # Main loop:
         ##############
-        # Tracks how many times feff has been run:
+
+        # Gets center of mass to check edge effects
+        atoms = scrape_xyz(f)
+        if '-e' in args:
+            center_of_mass = get_center_of_mass(atoms)
+
+        # Gets list of indices of Ta atoms
+        central = xyz_to_feff.central_indices(atoms)
+
+        # How many times to run?
+        num_center_atoms = len(central)
         run_index = 0
-        # num_center_atoms is set within the loop, initializing 
-        # arbitrarily so preconditions are met
-        num_center_atoms = 1
+
+        if '-e' in args:
+            skipped = []
+            not_skipped = []
 
         # To pay for speed in computing power, one could thread the following 
         # loop instead of doing each iteration consecutively
-        while run_index < num_center_atoms:
-    
+        for run_index in range(0, num_center_atoms):
+            # Gets the nth atom of Ta before any shifting
+            if '-e' in args:
+                nth = atoms[central[run_index]]
+                distsq = 0.0
+                for i in range(1,4):
+                    distsq += (center_of_mass[i-1]-float(nth[i]))**2
+                if distsq > ((FROM_CENTER ** 2)-EPSILON):
+                    print "Ta #" + str(run_index) + \
+                          " was too far away. "
+                    skipped.append(central[run_index])
+                    continue
+                else:
+                    not_skipped.append(run_index)
+
             # Making subdirectory to hold files for a fixed run index
             new_dir = get_dirname(f, run_index)
             make_sure_path_exists(new_dir)
@@ -60,54 +118,70 @@ def update_file(f, *args):
             # xyz_to_feff.py called
             # Note1: .xyz file is assumed to use atomic symbols, and angstroms 
             # as coordinates 
-            # Note2: when run_index == 0, xyz_to_feff records num_center_atoms 
-            # in temp.txt file.  
-            # Note3: xyz_to_feff is called every time.  It may seem redundant, 
+            # Note2: xyz_to_feff is called every time.  It may seem redundant, 
             # but this allows slightly easier and more sensibly modular
             # pruning of the data to be done within xyz_to_feff.py
+            # Note3: when run_index == 0, xyz_to_feff records num_center_atoms 
+            # in temp.txt file.  No longer necessary.
             convert_xyz(f, run_index)
     
             # feff called
             run_feff(f, run_index)
-    
-            # If not done already, gets num_center_atoms via the temp.txt file
-            if run_index == 0:
-                num_center_atoms = read_num_center_atoms(f)
-    
+            # ifeffit called on path files which feff just created
             calc_chik(f, run_index)
+
             run_index += 1
+
+        if '-e' in args:
+            write_metadata(f, "close_to_center_of_mass", str(not_skipped))
+            write_metadata(f, "far_from_center_of_mass", str(skipped))
         ##################
     else: 
-        num_center_atoms = read_num_center_atoms(f)
-
-    unaveraged_chik = get_dirname(f, "paths")
-    make_sure_path_exists(unaveraged_chik)
+        atoms = scrape_xyz(f)
+        center_of_mass = get_center_of_mass(atoms)
+        central = xyz_to_feff.central_indices(atoms)
+        num_center_atoms = len(central)
 
     ## Gathering chi(k) to push to matplotlib_script.py ##
+    f_indices = range(0, num_center_atoms)
+    if '-e' in args:
+        if '-n'  in args:
+            f_indices = read_metadata(f, "close_to_center_of_mass")
+            f_indices = f_indices.replace('[', '')
+            f_indices = f_indices.replace(']', '')
+            f_indices = f_indices.replace(' ', '')
+            f_indices = f_indices.replace('\n', '')
+            f_indices = f_indices.split(',')
+        else:
+            f_indices = not_skipped
     f_list = []
-    for i in range(0, num_center_atoms):
-        f_list.append( get_dirname(f, i) + "/ifeffit_out" )
+    for i in f_indices:
+        f_list.append( os.path.join(get_dirname(f, i), "ifeffit_out") )
+
+    print "Averaging following chi(k) files: "
+    for chikfile in f_list: print chikfile;
+    print str(len(f_list)) + " files averaged."
 
     ### Graphing and plotting in matplotlib: ###
 
-    # Averaging must occur before graphs can open
-    subprocess.call(['python', 
-         this_file_dir + '/' + 'matplotlib_script.py',
-         get_dirname(f), str(len(f_list))] + f_list + ['-a'])
+    if '-m' not in args:
+        # Averaging must occur before graphs can open
+        subprocess.call(['python', 
+             this_file_dir + '/' + 'matplotlib_script.py',
+             get_dirname(f), str(len(f_list))] + f_list + ['-a'])
 
-    # Plotting averaged chi(k) and chi(r)
-    # Opens subprocess via Popen to prevent matplotlib graphs from 
-    # blocking loops in super-processes.  
-    p = subprocess.Popen(['python', 
-                        this_file_dir + '/' + 'matplotlib_script.py',
-                        get_dirname(f), str(0), 
-                        '-k', '-r'])
+        # Plotting averaged chi(k) and chi(r)
+        # Opens subprocess via Popen to prevent matplotlib graphs from 
+        # blocking loops in super-processes.  
+        p = subprocess.Popen(['python', 
+                            this_file_dir + '/' + 'matplotlib_script.py',
+                            get_dirname(f), str(0), 
+                            '-k', '-r'])
 
-    # Should only wait for the LAST updated file, if update_file is called 
-    # on some short list (note there's some danger in parallelizing update_file
-    # since feff is called on the current directory, which can cause issues)
-    p.wait()
-    ############################################
+        # Would cause matplotlib plots to block terminal and monitoring 
+        # loop until closed
+        # p.wait()
+        ############################################
 
     ### Cleanup ###
     clean(f, num_center_atoms)

@@ -24,13 +24,20 @@ Usage
 
 After installation, run either 
 
-    $ update_xyz FILENAME [-n]
+    $ update_xyz FILENAME [FLAGS]
 
 or 
 
     $ watch_for_xyz [/dir/to/watch]
 
-By default watch\_for\_xyz watches your working directory.  Adding the -n flag to the end of update\_xyz will not run feff or ifeffit, only matplotlib.
+By default watch\_for\_xyz watches your working directory.  
+
+    Flags for update_xyz:
+    -m will skip displaying output graphs.
+    -e will use only paths from atoms nearby the center_of_mass 
+    -n will avoid re-calculating paths in feff, i.e. assumes that the file 
+        is already up-to-date and skips straight to calculating the average
+        chi(k) and graphing
 
 How to Obtain
 ===========
