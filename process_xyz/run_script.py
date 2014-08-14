@@ -39,7 +39,7 @@ def update_file(f, *args):
         for l in temp:
             # Checks if the part of a string appearing 
             # before an = on a line is s, returns rest of line 
-            if "".join(l.split('=')) != "" and \
+            if len(l) > 2 and "".join(l.split('=')) != "" and \
                 ("".join(l.split())).split('=')[0].split()[0] == s:
                  return '='.join(l.split('=')[1:])
 
@@ -58,7 +58,7 @@ def update_file(f, *args):
             for (i,l) in enumerate(r):
                 # Checks if the part of a string appearing 
                 # before an = on a line is s, returns rest of line 
-                if "".join(l.split('=')) != "" and \
+                if len(l) > 2 and "".join(l.split('=')) != "" and \
                     ("".join(l.split())).split('=')[0].split()[0] == s:
                      search = i
 
@@ -68,7 +68,8 @@ def update_file(f, *args):
         temp = open(file_path, 'w')
         if already_exists:
             for l in r:
-                temp.write(l + '\n')
+                temp.write(l)
+            temp.write('\n')
         temp.write(s + "=" + data)
         temp.close()
 
@@ -88,6 +89,7 @@ def update_file(f, *args):
         atoms = scrape_xyz(f)
         if '-e' in args:
             center_of_mass = get_center_of_mass(atoms)
+            write_metadata(f, "center_of_mass", str(center_of_mass))
 
         # Gets list of indices of Ta atoms
         central = xyz_to_feff.central_indices(atoms)
@@ -110,8 +112,9 @@ def update_file(f, *args):
                 for i in range(1,4):
                     distsq += (center_of_mass[i-1]-float(nth[i]))**2
                 if distsq > ((FROM_CENTER ** 2)-EPSILON):
-                    print "Ta #" + str(run_index) + \
-                          " was too far away. "
+                    print "Ta #" + str(run_index) + " at " +\
+                            str(tuple(nth[1:3])) +\
+                          " was too far. " + str((distsq)**(0.5))
                     skipped.append(central[run_index])
                     continue
                 else:
