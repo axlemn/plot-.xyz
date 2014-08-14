@@ -56,7 +56,7 @@ Navigate to the xyztofeff-0.1dev directory and run:
 
     $ python setup.py install --record files.txt
 
-Again, sudo may be necessary.  This write the locations all files which were created during installation to the folder "files.txt".  
+Again, sudo may be necessary.  This will write the locations all files which were created during installation to the folder "files.txt".  
 
 To remove most of them, run 
 
@@ -76,9 +76,13 @@ The xyz\_to\_feff program requires a couple of python packages, both of which ca
 
 Instructions to install pip itself may be found [here](http://pip.readthedocs.org/en/latest/installing.html).
 
-ifeffit and perl are also assumed to be installed, both of which can be installed through your package manager.  
+ifeffit and perl are also assumed to be installed, both of which can be installed through your package manager for Linux.  
 
-Perhaps most tricky to install is the perl wrapper for ifeffit.  This can also be installed through the package manager, and (for OSX) should be automatically installed if you install Athena.  
+Perhaps the most tricky requirement to install is the perl wrapper for ifeffit.  This can also be installed through the package manager, and (for OSX) should be automatically installed if you install Athena.  To check if you have the perl wrapper installed, run: 
+
+    $ perl -de "use Ifeffit"
+
+If you do not get an error (which would probably start with "Can't locate..."), then the wrapper is installed properly.  
 
 TODO:
 ----
@@ -88,7 +92,7 @@ TODO:
 Known issues
 ----
 - The message "Fatal Error: No absorbing atom (ipot=0) defined" probably means that the attempt at xyz conversion failed.  At this point, try running the test\_xyz\_converter.py script.
-- Files with incredibly long names cause errors.  This is probably for the best (since some filesystems cannot handle very long names in files)
+- Files with incredibly long names cause errors.  This is probably for the best (since some filesystems cannot move or delete very long names in files... Windows 7)
 
 Changelog 
 ----
