@@ -18,30 +18,61 @@ Files used to process\_xyz:
 - matplotlib\_script.py averages chi(k) files, and controls what matplotlib will eventually plot.
 - chir.ps converts chi.k files to chi.r files.  Called by the matplotlib\_script.
 
-Obtaining and Using
+Usage
+=====
+
+After installation, run either 
+
+    $ update_xyz FILENAME
+
+or 
+
+    $ watch_for_xyz [/dir/to/watch]
+
+By default this watches your working directory.  
+
+How to Obtain
 ===========
 Download the .tar.gz file under dist via the "View Raw" option from GitHub.
 
 Unpack the file:
-tar -zxvf xyztofeff-0.1dev.tar.gz
+
+    $tar -zxvf xyztofeff-0.1dev.tar.gz
+
 Navigate to the new directory:
-cd xyztofeff-0.1dev
+
+    $cd xyztofeff-0.1dev
+
 Install via:
-python setup.py install
-(Most users will want to use sudo for the install step.)
 
-To uninstall, run:
-pip uninstall xyztofeff
+    $python setup.py install 
+
+Most users will want to use sudo for the install step.
+The "--record files.txt" is not necessary, but will make uninstallation slightly simpler.  
+
+How to Uninstall
+-------------
+Navigate to the xyztofeff-0.1dev directory and run:
+
+    $python setup.py install --record files.txt
+
 Again, sudo may be necessary. 
-Note that the commands may still appear to exist, since pip may not remove files in your /usr/local/bin directory.
 
+Note that the commands may still appear to exist, since pip may not remove files in your /usr/local/bin directory.  This is fine if you intend to reinstall the program.  Otherwise, navigate to your /usr/local/bin and delete any files listed in files.txt.
+
+Requirements
+------------
 The xyz\_to\_feff program requires a couple of python packages, both of which can be installed via pip. 
-pip install periodic
-pip install matplotlib
+
+    $pip install periodic
+
+    $pip install matplotlib
 
 Instructions to install pip itself may be found [here](http://pip.readthedocs.org/en/latest/installing.html).
 
 ifeffit and perl are also assumed to be installed, both of which can be installed through your package manager.  
+
+Perhaps most tricky to install is the perl wrapper for ifeffit.  This can also be installed through the package manager, and (for OSX) should be automatically installed if you install Athena.  
 
 TODO:
 ----
@@ -52,7 +83,7 @@ TODO:
 
 Known issues
 ----
-- Note that if you encounter "Fatal Error: No absorbing atom (ipot=0) defined", it almost always means that the first attempt at xyz conversion failed.  At this point, try running the test\_xyz\_converter.py script.
+- The message "Fatal Error: No absorbing atom (ipot=0) defined" probably means that the attempt at xyz conversion failed.  At this point, try running the test\_xyz\_converter.py script.
 
 Changelog 
 ----
