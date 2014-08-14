@@ -23,7 +23,7 @@ def update_file(f, *args):
     file f on update.  Should work on relative paths, but if that's not working,
     passing the absolute path won't hurt.
 
-    Flags:
+    As stated in the readme, here is a list of possible flags:
     -m will skip displaying output graphs.
     -e will use only paths from atoms nearby the center_of_mass 
     -n will avoid re-calculating paths in feff, i.e. assumes that the file 
@@ -39,30 +39,36 @@ def update_file(f, *args):
         for l in temp:
             # Checks if the part of a string appearing 
             # before an = on a line is s, returns rest of line 
-            if l!="" and l.split('=') != [] and l.split('=')[0].split()[0] == s:
+            if "".join(l.split('=')) != "" and \
+                ("".join(l.split())).split('=')[0].split()[0] == s:
                  return '='.join(l.split('=')[1:])
 
     def write_metadata(f, s, data):
         '''Looks in f's directory for a METADATA_FILE, and from it reads
         and returns the data corresponding to the string s.'''
         file_path = get_dirname(f, METADATA_FILE)
-        temp = open(file_path, 'r')
-        search = None
-        r = temp.readlines()
-        temp.close()
+        already_exists = os.path.isfile(file_path)
 
-        for (i,l) in enumerate(r):
-            # Checks if the part of a string appearing 
-            # before an = on a line is s, returns rest of line 
-            if l!="" and l.split('=') != [] and l.split('=')[0].split()[0] == s:
-                 search = i
+        if already_exists:
+            temp = open(file_path, 'r')
+            search = None
+            r = temp.readlines()
+            temp.close()
 
-        if search != None:
-            r.pop(search)
+            for (i,l) in enumerate(r):
+                # Checks if the part of a string appearing 
+                # before an = on a line is s, returns rest of line 
+                if "".join(l.split('=')) != "" and \
+                    ("".join(l.split())).split('=')[0].split()[0] == s:
+                     search = i
+
+            if search != None:
+                r.pop(search)
 
         temp = open(file_path, 'w')
-        for l in r:
-            temp.write(l + '\n')
+        if already_exists:
+            for l in r:
+                temp.write(l + '\n')
         temp.write(s + "=" + data)
         temp.close()
 
@@ -158,9 +164,7 @@ def update_file(f, *args):
     for i in f_indices:
         f_list.append( os.path.join(get_dirname(f, i), "ifeffit_out") )
 
-    print "Averaging following chi(k) files: "
-    for chikfile in f_list: print chikfile;
-    print str(len(f_list)) + " files averaged."
+    print "Averaging following %d chi(k) files: " % str(len(f_list)) 
 
     ### Graphing and plotting in matplotlib: ###
 

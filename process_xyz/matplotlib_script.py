@@ -9,6 +9,8 @@ def avg_chik(f_list, dirname):
     d = {}
     d_init_flag = True
     for f_name in f_list:
+        print '*',
+        print f_name 
         f = open(f_name, 'r')
         for line in f:
             s = line.split()
@@ -134,7 +136,7 @@ def plot_files(f_list):
 def find_chir(dirname, chik=default_chik, chir=default_chir):
     '''Makes a Re[chi(r)] plot given a directory and the filename of a 
     chi(k) plot.'''
-    to_call = ['perl', 
+    to_call = ['perl',
                 os.path.dirname(os.path.realpath(__file__)) + '/chir.ps', 
                 dirname, 
                 chik, 

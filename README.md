@@ -1,8 +1,6 @@
 Description
 ===========
 
-NOT A WORKING COMMIT
-
 When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplotlib are used to plot the chi(k) formed by averaging over all possible choices for a central atom of a specific element (by default, Tantalum).  
 
 Made to work in \*nix.
