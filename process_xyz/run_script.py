@@ -164,7 +164,7 @@ def update_file(f, *args):
     for i in f_indices:
         f_list.append( os.path.join(get_dirname(f, i), "ifeffit_out") )
 
-    print "Averaging following %d chi(k) files: " % str(len(f_list)) 
+    print "Averaging following %d chi(k) files: " % len(f_list)
 
     ### Graphing and plotting in matplotlib: ###
 
