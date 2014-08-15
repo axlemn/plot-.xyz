@@ -1,7 +1,7 @@
 Description
 ===========
 
-plotxyz is a processing tool used to convert a .xyz file directly into chi(k) and chi(r) plots.  The watch\_for\_xyz command allows a user to work in a program which creates .xyz files, such as Avagadro, and immediately see chi(r) and chi(k) data upon saving.  
+plot.xyz is a processing tool which converts a .xyz file directly into chi(k) and chi(r) plots via feff, Ifeffit, and matplotlib.  The watch\_for\_xyz command takes a directory name and quickly displays the chi(r) and chi(k) data of any .xyz files modified or added to the directory while it is running.  This allows a user to work in a program which creates .xyz files, such as Avagadro, and immediately see plots of chi(r) and chi(k) data, which can be used to refine .xyz files in further modelling.  
 
 Made to work in \*nix.
 
