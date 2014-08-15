@@ -14,6 +14,7 @@ A input file to feff requires designation of a center, absorbing atom, so the .x
 As a Diagram
 -------
 <img src="https://github.com/axlemn/plot-.xyz/blob/master/flow_chart.png">
+Image courtesy of [ditaa](ditaa.sourceforge.net/).  
 
 Summary of each file (in order of usage):
 ==================
@@ -25,7 +26,8 @@ Files used to process\_xyz:
 ---------------
 - run\_script.py manages most spawning of subprocesses.  update\_file(FILENAME) is the main function. 
 - helper.py holds simple, universal functions/constants
-- xyz\_to\_feff.py takes in the path to a .xyz file and some n, and prints a feff.inp file with the nth Ta atom as the absorbing atom (n is zero-indexed).  
+- temp.txt stores metadata, such as center of mass, which atoms are close to the center of mass, etc. 
+- xyz\_to\_feff.py takes in the path to a .xyz file and some n, and prints a feff.inp file with the nth Ta atom as the absorbing atom.  n is zero-indexed.  
 - ifeffit\_script.ps takes a directory name, and uses all feff####.dat produced by feff in the directory to write a file containing chi(k) data.  
 - matplotlib\_script.py averages chi(k) files, and controls what matplotlib will eventually plot.
 - chir.ps converts chi.k files to chi.r files.  Called by the matplotlib\_script.
