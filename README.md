@@ -3,20 +3,29 @@ Description
 
 plotxyz is a processing tool used to convert a .xyz file directly into chi(k) and chi(r) plots.  The watch\_for\_xyz command allows a user to work in a program which creates .xyz files, such as Avagadro, and immediately see chi(r) and chi(k) data upon saving.  
 
-When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplotlib are used in combination to plot the chi(k) formed by averaging over all possible choices for a central atom of a specific element (by default, Tantalum).  It is also possible to only average over chi(k) files from atoms of that element close to the center of mass of the system.  
-
 Made to work in \*nix.
+
+How it Works
+=============
+When a .xyz file is changed in a monitored directory, the .xyz file is given to the function update\_file.  
+
+A input file to feff requires designation of a center, absorbing atom, so the .xyz file is converted into #ofTaAtoms feff.inp files, each in their own directory.  Ifeffit generates more reliable chi(k) plots than does feff, but does not calculate path files.  Feff is used to update path files.
+
+As a Diagram
+-------
+<img src="https://github.com/axlemn/plot-.xyz/blob/master/flow_chart.png">
 
 Summary of each file (in order of usage):
 ==================
 - watch\_for\_xyz takes in a directory to watch (by default the current directory), and contains the loop which tracks which files to update.  
 - update\_xyz takes in a single file to update.
+Both options only act on files by calls to run\_script.update\_file(FILENAME). 
 
 Files used to process\_xyz:
 ---------------
-- run\_script.py manages most spawning of subprocesses.  update\_file is the main function, and determines what will happen to a files given by watch\_for\_xyz.
-- helper.py holds several basic helper functions/constants
-- xyz\_to\_feff.py takes in the path to an xyz file and some n, and prints a feff.inp file with the nth Ta atom at the center (n is zero-indexed).  Atoms are filtered here (currently: removed if outside of threshold distance).
+- run\_script.py manages most spawning of subprocesses.  update\_file(FILENAME) is the main function. 
+- helper.py holds simple, universal functions/constants
+- xyz\_to\_feff.py takes in the path to a .xyz file and some n, and prints a feff.inp file with the nth Ta atom as the absorbing atom (n is zero-indexed).  
 - ifeffit\_script.ps takes a directory name, and uses all feff####.dat produced by feff in the directory to write a file containing chi(k) data.  
 - matplotlib\_script.py averages chi(k) files, and controls what matplotlib will eventually plot.
 - chir.ps converts chi.k files to chi.r files.  Called by the matplotlib\_script.
@@ -77,7 +86,7 @@ with sudo if you installed the program with sudo.
 
 Note that the commands may still appear to exist, since pip may not remove files in your /usr/local/bin directory.  This is fine if you intend to reinstall the program.  Otherwise, navigate to your /usr/local/bin and delete any files listed in files.txt.
 
-Requirements
+Dependencies
 ------------
 The xyz\_to\_feff program requires a couple of python packages, both of which can be installed via pip. 
 
