@@ -80,6 +80,7 @@ def update_file(f, *args):
         subprocess.call(['perl', this_file_dir + '/' + 'ifeffit_script.ps', \
             get_dirname(f, run_index)])
 
+    make_sure_path_exists(get_dirname(f))
     if '-n' not in args:
         ##############
         # Main loop:
