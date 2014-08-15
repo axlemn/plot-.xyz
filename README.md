@@ -1,7 +1,9 @@
 Description
 ===========
 
-When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplotlib are used to plot the chi(k) formed by averaging over all possible choices for a central atom of a specific element (by default, Tantalum).  
+plotxyz is a processing tool used to convert a .xyz file directly into chi(k) and chi(r) plots.  The watch\_for\_xyz command allows a user to work in a program which creates .xyz files, such as Avagadro, and immediately see chi(r) and chi(k) data upon saving.  
+
+When a .xyz file is changed in a monitored directory, feff, ifeffit, and matplotlib are used in combination to plot the chi(k) formed by averaging over all possible choices for a central atom of a specific element (by default, Tantalum).  It is also possible to only average over chi(k) files from atoms of that element close to the center of mass of the system.  
 
 Made to work in \*nix.
 
@@ -33,11 +35,11 @@ or
 By default watch\_for\_xyz watches your working directory.  
 
     Flags for update_xyz:
-    -m will skip displaying output graphs.
+    -m will skip the displaying graphs step.
     -e will use only paths from atoms nearby the center_of_mass 
     -n will avoid re-calculating paths in feff, i.e. assumes that the file 
         is already up-to-date and skips straight to calculating the average
-        chi(k) and graphing
+        chi(k) and graphing.  
 
 How to Obtain / Update
 ===========
@@ -57,7 +59,7 @@ Install via:
 
 Most users will want to use sudo for the install step.
 
-If you make your own changes, the install can also be used to overwrite old installed files with the newer ones.  
+The same command can also be used to install any changes made to files in the xyztofeff directory.  
 
 How to Uninstall
 -------------
