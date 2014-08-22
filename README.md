@@ -1,15 +1,19 @@
 Description
 ===========
 
-plot.xyz is a processing tool which converts a .xyz file directly into chi(k) and chi(r) plots via feff, Ifeffit, and matplotlib.  The watch\_for\_xyz command takes a directory name and quickly displays the chi(r) and chi(k) data of any .xyz files modified or added to the directory while it is running.  This allows a user to work in a program which creates .xyz files, such as Avagadro, and immediately see plots of chi(r) and chi(k) data, which can be used to refine .xyz files in further modelling.  
+plot.xyz is an EXAFS processing tool which takes in an .xyz file and displays its chi(k) and chi(r) data in matplotlib.  
 
-Made to work in \*nix.
+There are two different commands.  The watch\_for\_xyz command will display the chi(r) and chi(k) data of any .xyz files modified or added to a specified directory while it is running.  This allows users to use a program such as Avagadro to edit xyz files and immediately see plots of chi(r) and chi(k) data.  This allows users to tune .xyz files based on immediately accessible EXAFS data.  
+
+Made to work in Unix.  It should also work in Windows, but has only been tested in Linux. 
 
 How it Works
 =============
-When a .xyz file is changed in a monitored directory, the .xyz file is given to the function update\_file.  
+When a .xyz file is changed in a monitored directory, the watch\_for\_xyz script passes the filename is given to the function update\_file.  
 
-A input file to feff requires designation of a center, absorbing atom, so the .xyz file is converted into #ofTaAtoms feff.inp files, each in their own directory.  Ifeffit generates more reliable chi(k) plots than does feff, but does not calculate path files.  Feff is used to update path files.
+An input file to feff requires designation of a center, absorbing atom, and at most 500 atoms, so the .xyz file is then converted into #ofTaAtoms feff.inp files, each in their own subdirectory.  Ifeffit provides more options for chi(k) plots than feff does, but since it does not calculate path files, feff is used to calculate paths instead the feff defaults are used.
+
+Finally, the data from Ifeffit is processed and displayed via matplotlib.
 
 As a Diagram
 -------
@@ -21,9 +25,6 @@ Summary of each file (in order of usage):
 - watch\_for\_xyz takes in a directory to watch (by default the current directory), and contains the loop which tracks which files to update.  
 - update\_xyz takes in a single file to update.
 Both options only act on files by calls to run\_script.update\_file(FILENAME). 
-
-Files used to process\_xyz:
----------------
 - run\_script.py manages most spawning of subprocesses.  update\_file(FILENAME) is the main function. 
 - helper.py holds simple, universal functions/constants
 - temp.txt stores metadata, such as center of mass, which atoms are close to the center of mass, etc. 
